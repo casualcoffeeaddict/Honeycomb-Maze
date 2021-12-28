@@ -8,3 +8,7 @@ def hexagon_map(nCol, nRow):
 def excluded_platforms():
     '''This will define the areas of the map where the robots can not go as due to the pathfinding of the robot'''
     pass
+
+def hex_to_ssh():
+    '''Will make moves into the correct output to the ssh'''
+    pass

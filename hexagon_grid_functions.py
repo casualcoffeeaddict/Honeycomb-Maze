@@ -8,7 +8,6 @@ import math
 
 Point = collections.namedtuple("Point", ["x", "y"])
 
-
 _Hex = collections.namedtuple("Hex", ["q", "r", "s"])
 def Hex(q, r, s):
     '''This makes sure the Hex coordinates are in the right format'''
