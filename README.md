@@ -5,7 +5,6 @@ Alif Aziz
 2. Set initial robot positions
 3. Make Platform Map
    1. including making a list of positions that cant be final positions
-
 4. Get initial positions of robots
 5. pick new platform positions
 6. contruct path from inital to final positions
