@@ -290,23 +290,24 @@ def test_doubled_to_cube():
     equal_hex("doubled_to_cube doubled-r", Hex(1, 2, -3), rdoubled_to_cube(DoubledCoord(4, 2)))
 
 def test_all():
-    test_hex_arithmetic()
-    test_hex_direction()
-    test_hex_neighbor()
-    test_hex_diagonal()
-    test_hex_distance()
-    test_hex_rotate_right()
-    test_hex_rotate_left()
-    test_hex_round()
-    test_hex_linedraw()
-    test_layout()
-    test_offset_roundtrip()
-    test_offset_from_cube()
-    test_offset_to_cube()
-    test_doubled_roundtrip()
-    test_doubled_from_cube()
-    test_doubled_to_cube()
 
+    print(test_hex_arithmetic(),
+    test_hex_direction(),
+    test_hex_neighbor(),
+    test_hex_diagonal(),
+    test_hex_distance(),
+    test_hex_rotate_right(),
+    test_hex_rotate_left(),
+    test_hex_round(),
+    test_hex_linedraw(),
+    test_layout(),
+    test_offset_roundtrip(),
+    test_offset_from_cube(),
+    test_offset_to_cube(),
+    test_doubled_roundtrip(),
+    test_doubled_from_cube(),
+    test_doubled_to_cube()
+    )
 
 
 if __name__ == '__main__': test_all()
