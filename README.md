@@ -1,6 +1,6 @@
 # Honeycomb Maze Project
 Alif Aziz
-###Work flow for honeycomb maze:
+### Work flow for honeycomb maze:
 1. Connect to robots
 2. Set initial robot positions
    1. UI interface
