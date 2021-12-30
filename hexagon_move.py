@@ -26,9 +26,10 @@ def rel_turn(turning_robot, rotation, robot1, robot2):
     else:
         print('turn is not valid: robots consecutive to turning robot')
 
-def ssh_turn():
+def ssh_turn(rotation):
     '''send turn command to robot program'''
-    pass
+    output = []
+    return output
 
 def test():
     turning_robot = Hex(0, 0, 0)
