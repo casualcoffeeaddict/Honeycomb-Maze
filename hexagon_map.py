@@ -5,8 +5,6 @@ import random as rand
 inner_ring_directions_list = [Hex(1, 0, -1), Hex(1, -1, 0), Hex(0, -1, 1), Hex(-1, 0, 1), Hex(-1, 1, 0), Hex(0, 1, -1)]
 outer_ring_directions_list = [Hex(-2, 2, 0), Hex(2, -1, -1), Hex(2, -2, 0), Hex(1, 1, -2), Hex(0, 2, -2), Hex(-1, 2, -1), Hex(-2, 2, 0),Hex(-2, 1, 1), Hex(-2, 0, 2), Hex(-1, -1, 2), Hex(0, -2, 2), Hex(1, -2, 1)]
 
-
-
 def inner_ring(robot):
     '''will get the ring of moves around a given coordiate, coordiate of radius 1'''
     output = []
@@ -59,8 +57,8 @@ def excluded_platforms():
 
 def test():
     a = Hex(0, +1, -1)
-    inner_ring(a)
-    print(select_target_location(a))
+    print(inner_ring(a))
+    # print(select_target_location(a))
 
 if __name__ == '__main__':
     test()

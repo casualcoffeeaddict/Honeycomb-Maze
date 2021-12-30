@@ -33,9 +33,12 @@ def ssh_turn(rotation):
 
 def test():
     turning_robot = Hex(0, 0, 0)
-    robot1 = Hex(2, -2, 0)
+    robot1 = Hex(1, -1, 0)
     robot2 = Hex(-2, 2, 0)
-    print(rel_turn(turning_robot, -10, robot1, robot2))
+    print(valid_turn(turning_robot, robot1, robot2))
+    # print(rel_turn(turning_robot, -10, robot1, robot2))
+
+    print(-300 % 360)
 
 if __name__ == '__main__':
     test()
