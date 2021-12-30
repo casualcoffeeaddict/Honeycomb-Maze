@@ -29,7 +29,7 @@ def hex_rotate_left(a):
 def hex_rotate_right(a):
     return Hex(-a.r, -a.s, -a.q)
 
-hex_directions = [Hex(1, 0, -1), Hex(1, -1, 0), Hex(0, -1, 1), Hex(-1, 0, 1), Hex(-1, 1, 0), Hex(0, 1, -1)]
+    hex_directions = [Hex(1, 0, -1), Hex(1, -1, 0), Hex(0, -1, 1), Hex(-1, 0, 1), Hex(-1, 1, 0), Hex(0, 1, -1)]
 def hex_direction(direction):
     return hex_directions[direction]
 
