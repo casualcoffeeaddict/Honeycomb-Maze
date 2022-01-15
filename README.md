@@ -14,7 +14,7 @@ Alif Aziz
    1. positions will be pick from the list of possible moves from the inner ring
 6. construct path from initial to final positions
    1. Method:
-      1. go to outer ring
+      1. go from inner ring to outer ring
       2. move around outer ring - both need to hault on the outer ring until the other robot has made its move
       3. go back to inner ring
 7. check compatibility of all possible pairs of paths

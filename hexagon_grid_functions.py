@@ -1,4 +1,3 @@
-# Generated code -- CC0 -- No Rights Reserved -- http://www.redblobgames.com/grids/hexagons/
 
 from __future__ import division
 from __future__ import print_function
@@ -8,7 +7,7 @@ import math
 
 Point = collections.namedtuple("Point", ["x", "y"])
 
-_Hex = collections.namedtuple("Hex", ["q", "r", "s"])
+_Hex = collections.namedtuple("Hex", ["q", "r", "s"]) # Collects the location of the a given robot into a variable
 def Hex(q, r, s):
     '''This makes sure the Hex coordinates are in the right format'''
     assert not (round(q + r + s) != 0), "q + r + s must be 0"

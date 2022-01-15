@@ -36,6 +36,16 @@ def straight_move(start, end):
     # gets the list of coordinates between two points in 3D space
     pass
 
+def path_between_points(start, end):
+    '''Will get the x, y, z values of a vector between two points'''
+    x = end.q - start.q
+    y = end.r - start.r
+    z = end.s - start.s
+    move()
+    return Hex(x, y, z)
+
+    pass
+
 def hex_to_ssh():
     '''Will make moves into the correct output to the ssh'''
     pass
@@ -57,7 +67,9 @@ def excluded_platforms():
 
 def test():
     a = Hex(0, +1, -1)
-    print(inner_ring(a))
+    b = Hex(3, 10, -13)
+
+    print(path_between_points(a, b))
     # print(select_target_location(a))
 
 if __name__ == '__main__':
