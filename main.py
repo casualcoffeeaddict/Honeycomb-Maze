@@ -9,7 +9,5 @@ def main():
     while ar.check_if_animal_at_goal() == True:
         pass
 
-
-
 if __name__ == '__main__':
     main()
