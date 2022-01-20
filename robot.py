@@ -48,12 +48,25 @@ class PlatformRobot():
         else:
             print('select correct dimension: x, y, z')
 
+    def maze_boundaries(self, nRow, nCol):
+        '''Define the uboundaries of the useable area of the maze (for the hexagonal type robot) based on useable nCol
+        and nRow'''
+        # Assume the centre of the map is the origin.
+
+
 
 class AnimalRobot(PlatformRobot):
     '''Class for the platform with the animal on it'''
 
-    def __init__(self, x, y, z, rotation, goal_platform_class):
+    def __init__(self, x, y, z, rotation):
         super().__init__(x, y, z, rotation)
+        self.goal = None
+        self.maze = None
+
+    def set_maze_class(self, maze_class):
+        self.maze = maze_class
+
+    def set_goal_platform_class(self, goal_platform_class):
         self.goal = goal_platform_class
 
     def check_if_animal_at_goal(self):
@@ -67,11 +80,13 @@ class AnimalRobot(PlatformRobot):
 class NonAnimalRobot(PlatformRobot):
     '''Class for the platform without the animal on it'''
 
-    def __init__(self, x, y, z, rotation, animal_robot_class, *platform_robot_class):
+    def __init__(self, x, y, z, rotation):
         super().__init__(x, y, z, rotation)
+        # for defining the boundaries of the maze
+        self.maze= None
         # for encoding position relative to animal robot
-        self.animal_robot = animal_robot_class
-        self.platform_robot = platform_robot_class
+        self.animal_robot = None
+        self.platform_robot = None
         self.rel_position = self.get_relative_position([self.x, self.y, self.z])
         # for precession method
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
@@ -84,6 +99,15 @@ class NonAnimalRobot(PlatformRobot):
         self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
         self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
         self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
+
+    def set_platform_robot(self, non_animal_robot_class):
+        self.platform_robot = non_animal_robot_class
+
+    def set_animal_robot(self, animal_robot_class):
+        self.animal_robot = animal_robot_class
+
+    def set_maze(self, maze_class):
+        self.maze = maze_class
 
     def get_relative_animal_vector(self):
         '''gets the vector between the animal robot and the platform robot'''
@@ -194,13 +218,6 @@ class NonAnimalRobot(PlatformRobot):
             print('select direction of precession')
         return precession_values
 
-    def see_status(self):
-        '''Get summary information about robot'''
-        super().see_status()
-        print(
-            f'Relative Position: {self.rel_position}\n'
-        )
-
     def get_path(self, target_vector):
         '''Gets the path between the current position of the robot to the target position of the robot'''
         # move to outer ring
@@ -222,10 +239,16 @@ class NonAnimalRobot(PlatformRobot):
         move_to_inner_ring = self.move_to_inner_ring()
         return [*move_to_outer_ring, *precess, *move_to_inner_ring]
 
+    def see_status(self):
+        '''Get summary information about robot'''
+        super().see_status()
+        print(
+            f'Relative Position: {self.rel_position}\n'
+        )
+
     def select_mouse_movement(self):
         '''For testing, select a position mouse chooses to land on around the animal platform'''
-        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,
-                                                                                        -1]]  # def adding function between animal robot and this list to get list of available moves
+        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,-1]]  # def adding function between animal robot and this list to get list of available moves
         # available_moves.remove(self.platform_robot.position_vector)
         available_moves.remove(self.position_vector)
         return rand.choice(available_moves)
@@ -241,27 +264,11 @@ class AnimalGoal(PlatformRobot):
 def main():
     ag = AnimalGoal(0, 0, 0, 'x')
     ar = AnimalRobot(0, 0, 0, 'x', ag)
-    nar = NonAnimalRobot(1, 0, -1, 'x', ar)
+    nar = NonAnimalRobot(1, 0, -1, 'x', ar, nar2)
     nar2 = NonAnimalRobot(0, -1, 1, 'x', ar, nar)
 
     inner_list = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
     outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
-
-
-
-    for i in range(len(inner_list)):
-        x = inner_list[i][0]
-        y = inner_list[i][1]
-        z = inner_list[i][2]
-        nar3 = NonAnimalRobot(x, y, z, 'x', ar, nar)
-        print(
-            # nar3.move_to_outer_ring()
-            nar2.get_path(inner_list[i]),
-            # nar3.see_status(),
-            # nar3.get_path(inner_list[i]),
-            # nar2.see_status(),
-            # nar2.get_path([0,-1,1])
-        )
 
 
 if __name__ == '__main__':
