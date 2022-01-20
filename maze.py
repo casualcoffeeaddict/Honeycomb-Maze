@@ -14,6 +14,8 @@ class HexagonMaze(HexagonGrid):
         self.animal_goal = None
         self.non_animal_robot_1 = None
         self.non_animal_robot_2 = None
+        # move list of class
+        self.move_list = self.useable_area()
 
     def set_animal_robot(self, animal_robot_class):
         self.animal_robot = animal_robot_class
@@ -27,9 +29,15 @@ class HexagonMaze(HexagonGrid):
     def set_non_animal_robot_2(self, non_animal_robot_class_2):
         self.non_animal_robot_1 = non_animal_robot_class_2
 
-    def useable_area(self):
+    def hexagonal_useable_area(self):
         '''Maze are that can be used for hexagon style movement'''
-        pass
+        hexagonal_move_list = []
+        return hexagonal_move_list
+
+    def circular_useable_area(self):
+        '''Maze area that can be used for circular stype of movement'''
+        circular_move_list = []
+        return circular_move_list
 
 def main():
     hm = HexagonMaze(10, 10)
