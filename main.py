@@ -14,10 +14,12 @@ def initialisation():
     nar1.set_maze(hm)
     nar1.set_animal_robot(ar)
     nar1.set_platform_robot(nar2)
+    nar1.set_animal_goal(ag)
     # NonAnimalRobot2
     nar2.set_maze(hm)
     nar2.set_animal_robot(ar)
     nar2.set_platform_robot(nar1)
+    nar2.set_animal_goal(ag)
     # AnimalRobot
     ar.set_maze_class(hm)
     ar.set_goal_platform_class(ag)
@@ -29,9 +31,13 @@ def initialisation():
 
 def main():
     initialisation()
-    while ar.check_if_animal_at_goal() == True:
-
-        pass
+    # get the position of the animal
+    # based on this assign the robot classes (for animal and nonanimal robots)
+    # get the positions to the new platform positions
+    # get the path to the new platform positions (haven't made function for making sure oppsoite paths)
+    # timing???
+    # send paths to robots
+    # check if animal robot it at goal
 
 if __name__ == '__main__':
     main()

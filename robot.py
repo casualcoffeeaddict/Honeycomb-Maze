@@ -11,9 +11,11 @@ class PlatformRobot():
         self.x = x
         self.y = y
         self.z = z
-        self.position_vector = [x, y, z]
+        self.position_vector = [self.x, self.y, self.z]
         self.rotation = self.dimension_dict[rotation]
-
+        # for inner ring function
+        self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
+        self.inner_ring_steps = [-1, -1, -1, 1, 1, 1]
     def see_status(self):
         '''Get summary information about robot'''
         print(
@@ -21,6 +23,22 @@ class PlatformRobot():
             '\nPostion Vector:', self.position_vector,
             '\nRotation:', self.rotation
         )
+
+    def get_inner_ring(self):
+        inner_ring_list = []
+        self.change_position('y', 1)
+        for i in range(len(self.inner_ring_dim)):
+            inner_ring_list.append(self.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
+        return inner_ring_list
+
+    def select_mouse_movement(self):
+        '''For testing, select a position mouse chooses to land on around the animal platform'''
+        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,
+                                                                                        -1]]  # def adding function between animal robot and this list to get list of available moves
+        # available_moves.remove(self.platform_robot.position_vector)
+        available_moves.remove(self.position_vector)
+        return rand.choice(available_moves)
+
 
     def change_rotation(self, change):
         '''Change the encoded orientation of the platform. Is between 0-2'''
@@ -48,11 +66,6 @@ class PlatformRobot():
         else:
             print('select correct dimension: x, y, z')
 
-    def maze_boundaries(self, nRow, nCol):
-        '''Define the uboundaries of the useable area of the maze (for the hexagonal type robot) based on useable nCol
-        and nRow'''
-        # Assume the centre of the map is the origin.
-
 
 
 class AnimalRobot(PlatformRobot):
@@ -62,12 +75,27 @@ class AnimalRobot(PlatformRobot):
         super().__init__(x, y, z, rotation)
         self.goal = None
         self.maze = None
+        self.non_animal_robot_1 = None
+        self.non_animal_robot_2 = None
+        self.animal_goal = None
+        # non animal robot's next position information
+        self.nar_platform_goal1 = None
+        self.nar_platform_goal2 = None
 
     def set_maze_class(self, maze_class):
         self.maze = maze_class
 
     def set_goal_platform_class(self, goal_platform_class):
         self.goal = goal_platform_class
+
+    def set_non_animal_robot_1(self, non_animal_robot_class_1):
+        self.non_animal_robot_1 = non_animal_robot_class_1
+
+    def set_animal_goal(self, animal_goal_class):
+        self.animal_goal = animal_goal_class
+
+    def set_non_animal_robot_2(self, non_animal_robot_class_2):
+        self.non_animal_robot_1 = non_animal_robot_class_2
 
     def check_if_animal_at_goal(self):
         '''Checks if the animal platform is at the goal platform'''
@@ -76,6 +104,29 @@ class AnimalRobot(PlatformRobot):
         elif self.goal.position_vector != self.position_vector:
             return False
 
+    def get_new_animal_positions(self):
+        '''Gets two random positions from the inner ring of the AnimalRobot that the NonAnimalRobots
+        are not occupying'''
+        inner_ring_list = self.get_inner_ring()
+        inner_ring_positions = []
+        for i in range(len(inner_ring_list)):
+            inner_ring_positions.append(inner_ring_list[i][0])
+
+        # remove the positions of obstacles on the maze
+        if self.non_animal_robot_1 != None:
+            inner_ring_positions.remove(self.non_animal_robot_1.position_vector)
+        if self.non_animal_robot_2 != None:
+            inner_ring_positions.remove(self.non_animal_robot_2.position_vector)
+        if self.animal_goal != None:
+            inner_ring_positions.remove(self.animal_goal.position_vector)
+
+        # select choice from remaining list
+        return rand.choices(inner_ring_positions, k=2)
+
+    def set_new_animal_positions(self):
+        choice_1, choice_2 = self.get_new_animal_positions()
+        if choice_1 == choice_2:
+            self.set_new_animal_positions()
 
 class NonAnimalRobot(PlatformRobot):
     '''Class for the platform without the animal on it'''
@@ -87,6 +138,7 @@ class NonAnimalRobot(PlatformRobot):
         # for encoding position relative to animal robot
         self.animal_robot = None
         self.platform_robot = None
+        self.animal_goal = None
         self.rel_position = self.get_relative_position([self.x, self.y, self.z])
         # for precession method
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
@@ -110,6 +162,9 @@ class NonAnimalRobot(PlatformRobot):
 
     def set_maze(self, maze_class):
         self.maze = maze_class
+
+    def set_animal_goal(self, animal_goal_class):
+        self.animal_goal = animal_goal_class
 
     def get_relative_animal_vector(self):
         '''gets the vector between the animal robot and the platform robot'''
@@ -200,7 +255,7 @@ class NonAnimalRobot(PlatformRobot):
             self.change_position(self.ring_dim[self.rel_position], self.inner_ring_steps[self.rel_position])]
         return inner_ring_move
 
-    def precession(self, clockwise, steps):
+    def precession(self, clockwise, steps, ):
         '''direction of precession, start position, and number of steps'''
         precession_values = []
         print('no of steps in precession:', steps)
@@ -248,18 +303,28 @@ class NonAnimalRobot(PlatformRobot):
             f'Relative Position: {self.rel_position}\n'
         )
 
-    def select_mouse_movement(self):
-        '''For testing, select a position mouse chooses to land on around the animal platform'''
-        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,-1]]  # def adding function between animal robot and this list to get list of available moves
-        # available_moves.remove(self.platform_robot.position_vector)
-        available_moves.remove(self.position_vector)
-        return rand.choice(available_moves)
-
-    def is_valid_move(self):
+    def is_in_maze(self):
+        '''Makes sure the movement path does not leave the arena'''
         if self.move_list in self.maze.valid_moves:
             return True
         if self.move_list not in self.maze.valid_moves:
+            print('ERROR: Robot Path is out of bounds')
             return False
+
+    def is_not_inside_other_robots(self):
+        '''Check if the current position of the robot intersects with the position of another robot'''
+        if self.position_vector == self.animal_robot.position_vector:
+            print('ERROR: Robot is in Animal Robot')
+            return False
+        elif self.position_vector == self.platform_robot.postion_vector:
+            print('ERROR: Robot is in NonAnimalRobot')
+            return False
+        elif self.position_vector == self.animal_goal.position_vector:
+            print('ERROR: Robot is in AnimalGoal')
+            return False
+        else:
+            return True
+
 
 class AnimalGoal(PlatformRobot):
     '''Class of platform robot with the goal on it'''
@@ -269,9 +334,11 @@ class AnimalGoal(PlatformRobot):
 
 
 def main():
-
-
-    inner_list = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
+    pr = AnimalRobot(0,0,0,'x')
+    print(
+        # pr.get_inner_ring(),
+        pr.get_new_animal_positions())
+    inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
     outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
 
 

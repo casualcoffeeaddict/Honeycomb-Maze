@@ -72,7 +72,6 @@ class HexagonMaze(HexagonGrid):
         circular_move_list = []
         return circular_move_list
 
-
 def main():
     hm = HexagonMaze(3, 3)
     print(hm.hexagonal_useable_area())
