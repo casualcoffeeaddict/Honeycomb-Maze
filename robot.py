@@ -83,7 +83,7 @@ class NonAnimalRobot(PlatformRobot):
     def __init__(self, x, y, z, rotation):
         super().__init__(x, y, z, rotation)
         # for defining the boundaries of the maze
-        self.maze= None
+        self.maze = None
         # for encoding position relative to animal robot
         self.animal_robot = None
         self.platform_robot = None
@@ -99,6 +99,8 @@ class NonAnimalRobot(PlatformRobot):
         self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
         self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
         self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
+        # move list for robot steps
+        self.move_list = None
 
     def set_platform_robot(self, non_animal_robot_class):
         self.platform_robot = non_animal_robot_class
@@ -253,6 +255,11 @@ class NonAnimalRobot(PlatformRobot):
         available_moves.remove(self.position_vector)
         return rand.choice(available_moves)
 
+    def is_valid_move(self):
+        if self.move_list in self.maze.valid_moves:
+            return True
+        if self.move_list not in self.maze.valid_moves:
+            return False
 
 class AnimalGoal(PlatformRobot):
     '''Class of platform robot with the goal on it'''
@@ -262,10 +269,7 @@ class AnimalGoal(PlatformRobot):
 
 
 def main():
-    ag = AnimalGoal(0, 0, 0, 'x')
-    ar = AnimalRobot(0, 0, 0, 'x', ag)
-    nar = NonAnimalRobot(1, 0, -1, 'x', ar, nar2)
-    nar2 = NonAnimalRobot(0, -1, 1, 'x', ar, nar)
+
 
     inner_list = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
     outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
