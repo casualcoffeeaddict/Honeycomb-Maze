@@ -64,11 +64,9 @@ class MazeRobot(PlatformRobot):
         self.rel_position = self.get_relative_position(self.position_vector)
         # for precession method
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
-        self.two_clockwise_step = [-2, -2, -2, 2, 2, 2]
-        # self.one_clockwise_step = [-1, -1, -1, 1, 1, 1]
+        self.clockwise_step = [-1, -1, -1, 1, 1, 1]
         self.anticlockwise_dim = ['z', 'x', 'y', 'z', 'x', 'y']
-        self.two_anticlockwise_step = [-2, 2, 2, 2, -2, -2]
-        # self.one_anticlockwise_step = [1, 1, 1, -1, -1, -1]
+        self.anticlockwise_step = [-1, 1, 1, 1, -1, -1]
         # for moving in and out of outer ring
         self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
         self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
@@ -91,6 +89,9 @@ class MazeRobot(PlatformRobot):
     def set_move_list(self):
         # self.move_list =
         pass
+
+    def add_initial_position_to_list(self):
+        return self.move_list.append(0, self.position_vector)
 
     def get_relative_animal_vector(self):
         '''Return vector between two the animal_robot and robot'''
@@ -175,21 +176,21 @@ class MazeRobot(PlatformRobot):
             self.change_position(self.ring_dim[self.rel_position], self.inner_ring_steps[self.rel_position])]
         return inner_ring_move
 
-    def precession(self, clockwise, steps, ):
+    def precession(self, clockwise, precess_steps, precess_radius):
         '''direction of precession, start position, and number of steps'''
         precession_values = []
-        print('no of steps in precession:', steps)
+        print('no of steps in precession:', precess_steps)
         if clockwise == True:
             # precess clockwise
-            for i in range(0, steps):
+            for i in range(0, precess_steps):
                 self.position_vector = self.change_position(self.clockwise_dim[self.rel_position],
-                                                            self.two_clockwise_step[self.rel_position])
+                                                            self.clockwise_step[self.rel_position * precess_radius])
                 precession_values.append(self.position_vector)
         elif not clockwise:
             # precess anticlockwise
-            for i in range(0, steps):
+            for i in range(0, precess_steps):
                 self.position_vector = self.change_position(self.anticlockwise_dim[self.rel_position],
-                                                            self.two_anticlockwise_step[self.rel_position])
+                                                            self.anticlockwise_step[self.rel_position * precess_radius])
                 precession_values.append(self.position_vector)
         else:
             print('select direction of precession')

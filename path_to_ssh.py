@@ -1,6 +1,4 @@
 
-def add_inital_position_to_list(self):
-    return self.move_list.append(0, self.position_vector)
 
 def movement_to_vector(self):
     for i in range(len(self.move_list)):

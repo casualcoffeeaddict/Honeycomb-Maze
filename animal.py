@@ -1,6 +1,5 @@
 '''Animal class which take inputs from DLC and makes decisions about which platform it moves to'''
 import random as rand
-from robot import *
 
 class Animal():
     def __init__(self, platform):
