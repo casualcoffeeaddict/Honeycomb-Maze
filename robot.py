@@ -203,17 +203,16 @@ class MazeRobot(PlatformRobot):
         self.see_status()
         # precess around outer ring
         clockwise = self.choose_precess_direction(target_vector)
-        steps = self.get_platform_rel_position_difference(target_vector)
+        precess_steps = self.get_platform_rel_position_difference(target_vector)
         if clockwise == True:
-            steps = steps
+            precess_steps = precess_steps
         elif clockwise == False:
-            steps = 6 - steps
+            precess_steps = 6 - precess_steps
         print('Clockwise:', clockwise,
-              '\nSteps:', steps,
+              '\nSteps:', precess_steps,
               '\nStart:', self.position_vector)
-        precess = self.precession(clockwise, steps)
+        precess = self.precession(clockwise, precess_steps, precess_radius=2)
         # move to inner ring
-        # *precess, *move_to_inner_ring
         move_to_inner_ring = self.move_to_inner_ring()
         return [*move_to_outer_ring, *precess, *move_to_inner_ring]
 
