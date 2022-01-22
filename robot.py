@@ -1,6 +1,6 @@
 '''Robot classes and their functions for hexagon maze'''
-import random as rand
-
+# import random as rand
+#
 class PlatformRobot():
     '''Base platform class and basic moving functions'''
 
@@ -11,8 +11,6 @@ class PlatformRobot():
         self.position_vector = [x, y, z]
         self.rotation = self.dimension_dict[rotation]
         # for inner ring function
-        self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
-        self.inner_ring_steps = [-1, -1, -1, 1, 1, 1]
 
     def see_status(self):
         '''Get summary information about robot'''
@@ -21,22 +19,6 @@ class PlatformRobot():
             '\nPostion Vector:', self.position_vector,
             '\nRotation:', self.rotation
         )
-
-    def get_inner_ring(self):
-        inner_ring_list = []
-        self.change_position('y', 1)
-        for i in range(len(self.inner_ring_dim)):
-            inner_ring_list.append(self.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
-        return inner_ring_list
-
-    def select_mouse_movement(self):
-        '''For testing, select a position mouse chooses to land on around the animal platform'''
-        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,-1]]
-        # def adding function between animal robot and this list to get list of available moves
-        # available_moves.remove(self.platform_robot.position_vector)
-        available_moves.remove(self.position_vector)
-        return rand.choice(available_moves)
-
 
     def change_rotation(self, change):
         '''Change the encoded orientation of the platform. Is between 0-2'''

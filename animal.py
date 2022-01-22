@@ -1,5 +1,5 @@
 '''Animal class which take inputs from DLC and makes decisions about which platform it moves to'''
-
+import random as rand
 from robot import *
 
 class Animal():
@@ -14,6 +14,9 @@ class Animal():
         #
         self.animal_choice_1 = None
         self.animal_choice_2 = None
+        # get inner ring data
+        self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
+        self.inner_ring_steps = [-1, -1, -1, 1, 1, 1]
 
     def set_platform_1(self, platform_1_class):
         self.platform_1 = platform_1_class.position_vector
@@ -46,6 +49,13 @@ class Animal():
         elif self.animal_goal.position_vector != self.position_vector:
             return False
 
+    def get_inner_ring(self):
+        inner_ring_list = []
+        self.animal_robot.change_position('y', 1)
+        for i in range(len(self.inner_ring_dim)):
+            inner_ring_list.append(self.animal_robot.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
+        return inner_ring_list
+
     def get_new_animal_positions(self):
         '''FOR TESTING: Gets two random positions from the inner ring of the AnimalRobot that the NonAnimalRobots
         are not occupying'''
@@ -69,3 +79,7 @@ class Animal():
         choice_1, choice_2 = self.get_new_animal_positions()
         if choice_1 == choice_2:
             self.get_new_animal_positions()
+
+    def get_random_platform_choice(self):
+        choice_list = [self.animal_choice_1, self.animal_choice_2]
+        return rand.choice(choice_list)
