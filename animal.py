@@ -19,9 +19,13 @@ class Animal():
     def set_platform_3(self, platform_3_class):
         self.platform_3 = platform_3_class.position_vector
 
-    def move_mouse(self, platform):
+    def select_animal_move(self, platform):
         self.position = platform.position_vector
 
+    def get_animal_platform(self):
+        '''Get the platform which is has the animal on it'''
+        pass
+
     def choose_random_platform(self):
-        '''FOR TESTING: choose platform the animal moves to '''
+        '''FOR TESTING: choose platform the animal moves to'''
         pass

@@ -8,10 +8,7 @@ class PlatformRobot():
         # for rotation change method
         self.dimension_dict = {'x': 0, 'y': 1, 'z': 2}
         # location information about platform
-        self.x = x
-        self.y = y
-        self.z = z
-        self.position_vector = [self.x, self.y, self.z]
+        self.position_vector = [x, y, z]
         self.rotation = self.dimension_dict[rotation]
         # for inner ring function
         self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
@@ -33,8 +30,8 @@ class PlatformRobot():
 
     def select_mouse_movement(self):
         '''For testing, select a position mouse chooses to land on around the animal platform'''
-        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,
-                                                                                        -1]]  # def adding function between animal robot and this list to get list of available moves
+        available_moves = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1,-1]]
+        # def adding function between animal robot and this list to get list of available moves
         # available_moves.remove(self.platform_robot.position_vector)
         available_moves.remove(self.position_vector)
         return rand.choice(available_moves)
@@ -46,25 +43,29 @@ class PlatformRobot():
         return self.rotation // 3
 
     def change_position(self, dimension, step):
-        '''Moving the platform around in the hexagonal coordinate space'''
+        '''Move position vector around the board'''
         rotation_check = self.dimension_dict[dimension]
         if self.rotation != dimension:
             change = self.dimension_dict[dimension] - self.rotation
             self.change_rotation(change)
+        x, y, z = self.position_vector
         if dimension == 'x' and self.rotation == rotation_check:
-            self.y = self.y + step
-            self.z = self.z - step
-            return [[self.x, self.y, self.z], self.rotation]
+            y += step
+            z -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         elif dimension == 'y' and self.rotation == rotation_check:
-            self.x = self.x + step
-            self.z = self.z - step
-            return [[self.x, self.y, self.z], self.rotation]
+            x += step
+            z -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         elif dimension == 'z' and self.rotation == rotation_check:
-            self.x = self.x + step
-            self.y = self.y - step
-            return [[self.x, self.y, self.z], self.rotation]
+            x += step
+            y -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         else:
-            print('select correct dimension: x, y, z')
+            print('ERROR: Select correct dimension, either x, y, z')
 
 
 
@@ -128,7 +129,8 @@ class AnimalRobot(PlatformRobot):
         if choice_1 == choice_2:
             self.set_new_animal_positions()
 
-class NonAnimalRobot(PlatformRobot):
+
+class MazeRobot(PlatformRobot):
     '''Class for the platform without the animal on it'''
 
     def __init__(self, x, y, z, rotation):
@@ -139,7 +141,7 @@ class NonAnimalRobot(PlatformRobot):
         self.animal_robot = None
         self.platform_robot = None
         self.animal_goal = None
-        self.rel_position = self.get_relative_position([self.x, self.y, self.z])
+        self.rel_position = self.get_relative_position(self.position_vector)
         # for precession method
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
         self.two_clockwise_step = [-2, -2, -2, 2, 2, 2]
@@ -166,11 +168,13 @@ class NonAnimalRobot(PlatformRobot):
     def set_animal_goal(self, animal_goal_class):
         self.animal_goal = animal_goal_class
 
+    def set_move_list(self):
+        # self.move_list =
+        pass
+
     def get_relative_animal_vector(self):
-        '''gets the vector between the animal robot and the platform robot'''
-        return (self.x - self.animal_robot.x,
-                self.y - self.animal_robot.y,
-                self.z - self.animal_robot.z)
+        '''Return vector between two the animal_robot and robot'''
+        return [a - b for a, b in zip(self.animal_robot.position_vector, self.position_vector)]
 
     def get_relative_position(self, vector):
         '''gets the relative position (encoded) between the animal and platform robot'''
@@ -193,33 +197,29 @@ class NonAnimalRobot(PlatformRobot):
             print('Robot is off axis (its position is invalid because it is off axis), or robot is at origin')
 
     def change_position(self, dimension, step):
-        '''REDEFINED: Moving the platform around in the hexagonal coordinate space'''
+        '''Move position vector around the board'''
         rotation_check = self.dimension_dict[dimension]
         if self.rotation != dimension:
             change = self.dimension_dict[dimension] - self.rotation
             self.change_rotation(change)
+        x, y, z = self.position_vector
         if dimension == 'x' and self.rotation == rotation_check:
-            self.y = self.y + step
-            self.z = self.z - step
-            vector = [self.x, self.y, self.z]
-            self.get_relative_position(vector)
-            self.rel_position = self.get_relative_position(vector)
-            return [vector, self.rotation]
+            y += step
+            z -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         elif dimension == 'y' and self.rotation == rotation_check:
-            self.x = self.x + step
-            self.z = self.z - step
-            vector = [self.x, self.y, self.z]
-            self.get_relative_position(vector)
-            self.rel_position = self.get_relative_position(vector)
-            return [vector, self.rotation]
+            x += step
+            z -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         elif dimension == 'z' and self.rotation == rotation_check:
-            self.x = self.x + step
-            self.y = self.y - step
-            vector = [self.x, self.y, self.z]
-            self.rel_position = self.get_relative_position(vector)
-            return [vector, self.rotation]
+            x += step
+            y -= step
+            self.position_vector = [x, y, z]
+            return [self.position_vector, self.rotation]
         else:
-            print('select correct dimension: x, y, z')
+            print('ERROR: Select correct dimension, either x, y, z')
 
     def get_platform_rel_position_difference(self, vector):
         '''Gets the difference in rel_position between the non animal platform's position and the rel_position of the
