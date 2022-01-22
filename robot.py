@@ -10,7 +10,6 @@ class PlatformRobot():
         # location information about platform
         self.position_vector = [x, y, z]
         self.rotation = self.dimension_dict[rotation]
-        # for inner ring function
 
     def see_status(self):
         '''Get summary information about robot'''

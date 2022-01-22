@@ -23,11 +23,11 @@ robot3.set_maze(hm)
 robot2.set_animal_robot(robot1)
 robot3.set_animal_robot(robot1)
 mouse.set_animal_goal(goal)
-#
 
 def main():
     print(
-        robot2.move_to_outer_ring())
+        mouse.get_inner_ring()
+    )
     pass
 
 if __name__ == '__main__':

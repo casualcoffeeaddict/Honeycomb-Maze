@@ -2,8 +2,8 @@
 import random as rand
 
 class Animal():
-    def __init__(self, platform):
-        self.position_vector = None
+    def __init__(self, platform_class):
+        self.position_vector = platform_class.position_vector
         # references to other robots
         self.animal_robot = None
         self.non_animal_robot_1 = None
@@ -16,6 +16,23 @@ class Animal():
         # get inner ring data
         self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
         self.inner_ring_steps = [-1, -1, -1, 1, 1, 1]
+
+    def change_position(self, dimension, step):
+        '''Move position vector around the board'''
+        x, y, z = self.position_vector
+        if dimension == 'x':
+            y += step
+            z -= step
+        elif dimension == 'y':
+            x += step
+            z -= step
+        elif dimension == 'z':
+            x += step
+            y -= step
+        else:
+            print('ERROR: Select correct dimension, either x, y, z')
+        self.position_vector = [x, y, z]
+        return self.position_vector
 
     def set_animal_goal(self, animal_goal_class):
         self.animal_goal = animal_goal_class
@@ -46,10 +63,11 @@ class Animal():
             return False
 
     def get_inner_ring(self):
+        '''get the positions of the consecutive 6 spaces around the mouse platform'''
         inner_ring_list = []
-        self.animal_robot.change_position('y', 1)
+        self.change_position('y', 1)
         for i in range(len(self.inner_ring_dim)):
-            inner_ring_list.append(self.animal_robot.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
+            inner_ring_list.append(self.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
         return inner_ring_list
 
     def get_new_animal_positions(self):
