@@ -17,17 +17,14 @@ class Animal():
         self.inner_ring_dim = ['x', 'y', 'z', 'x', 'y', 'z']
         self.inner_ring_steps = [-1, -1, -1, 1, 1, 1]
 
-    def set_platform_1(self, platform_1_class):
-        self.platform_1 = platform_1_class.position_vector
-
-    def set_platform_2(self, platform_2_class):
-        self.platform_2 = platform_2_class.position_vector
-
-    def set_platform_3(self, platform_3_class):
-        self.platform_3 = platform_3_class.position_vector
-
     def set_animal_goal(self, animal_goal_class):
         self.animal_goal = animal_goal_class
+
+    def set_animal_robot(self, animal_robot):
+        self.animal_robot = animal_robot
+
+    def set_non_animal_robot_1(self, non_animal_robot_1):
+        self.non_animal_robot_1 = non_animal_robot_1
 
     def reassign_animal_robot_class(self, animal_robot, non_animal_robot_class_1, non_animal_robot_class_2):
         self.animal_robot = animal_robot
@@ -74,11 +71,20 @@ class Animal():
         # select choice from remaining list
         return rand.choices(inner_ring_positions, k=2)
 
-    def set_new_animal_choice(self):
+    def set_new_animal_choices(self):
+        '''Get choices for the animal to decide to move to'''
         choice_1, choice_2 = self.get_new_animal_positions()
         if choice_1 == choice_2:
             self.get_new_animal_positions()
+        else:
+            self.animal_choice_1 = choice_1
+            self.animal_choice_2 = choice_2
 
-    def get_random_platform_choice(self):
+    def animal_makes_choice(self):
+        '''FOR TESTING: Animal makes choice; randomly'''
         choice_list = [self.animal_choice_1, self.animal_choice_2]
         return rand.choice(choice_list)
+
+    def animal_makes_choice_DLC(self):
+        '''Dummy function for where the animal chooses via integration with deeplabcut'''
+        pass
