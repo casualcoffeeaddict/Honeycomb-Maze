@@ -1,5 +1,6 @@
 '''Animal class which take inputs from DLC and makes decisions about which platform it moves to'''
 import random as rand
+import time
 
 class Animal():
     def __init__(self, platform_class):
@@ -76,15 +77,16 @@ class Animal():
         inner_ring_list = self.get_inner_ring()
         inner_ring_positions = []
         for i in range(len(inner_ring_list)):
-            inner_ring_positions.append(inner_ring_list[i][0])
+            inner_ring_positions.append(inner_ring_list[i])
 
-        # remove the positions of obstacles on the maze from selection
-        if self.non_animal_robot_1 != None:
-            inner_ring_positions.remove(self.non_animal_robot_1.position_vector)
-        if self.non_animal_robot_2 != None:
-            inner_ring_positions.remove(self.non_animal_robot_2.position_vector)
-        if self.animal_goal != None:
-            inner_ring_positions.remove(self.animal_goal.position_vector)
+
+        # # remove the positions of obstacles on the maze from selection
+        # if self.non_animal_robot_1.position_vector is not inner_ring_positions:
+        #     inner_ring_positions.remove(self.non_animal_robot_1.position_vector)
+        # if self.non_animal_robot_2.position_vector is not inner_ring_positions:
+        #     inner_ring_positions.remove(self.non_animal_robot_2.position_vector)
+        # if self.animal_goal.position_vector is not inner_ring_positions:
+        #     inner_ring_positions.remove(self.animal_goal.position_vector)
 
         # select choice from remaining list
         return rand.choices(inner_ring_positions, k=2)
@@ -94,14 +96,16 @@ class Animal():
         choice_1, choice_2 = self.get_new_animal_positions()
         if choice_1 == choice_2:
             self.get_new_animal_positions()
+            self.set_new_animal_choices()
         else:
             self.animal_choice_1 = choice_1
             self.animal_choice_2 = choice_2
-
+        return self.animal_choice_1, self.animal_choice_2
     def animal_makes_choice(self):
         '''FOR TESTING: Animal makes choice; randomly'''
+        self.set_new_animal_choices()
         choice_list = [self.animal_choice_1, self.animal_choice_2]
-        return rand.choice(choice_list)
+        return rand.choice(choice_lis)
 
     def animal_makes_choice_DLC(self):
         '''Dummy function for where the animal chooses via integration with deeplabcut'''

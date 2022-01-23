@@ -26,7 +26,8 @@ mouse.set_animal_goal(goal)
 
 def main():
     print(
-        mouse.get_inner_ring()
+        # mouse.get_inner_ring(),
+        mouse.animal_makes_choice()
     )
     pass
 
