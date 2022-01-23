@@ -6,12 +6,12 @@ class Animal():
     def __init__(self, platform_class):
         self.position_vector = platform_class.position_vector
         # references to other robots
-        self.animal_robot = None
+        self.animal_robot = platform_class
         self.non_animal_robot_1 = None
         self.non_animal_robot_2 = None
         # animal goal
         self.animal_goal = None
-        #
+        # the choice of platforms the animal can choose to go to
         self.animal_choice_1 = None
         self.animal_choice_2 = None
         # get inner ring data
@@ -43,6 +43,9 @@ class Animal():
 
     def set_non_animal_robot_1(self, non_animal_robot_1):
         self.non_animal_robot_1 = non_animal_robot_1
+
+    def set_non_animal_robot_2(self, non_animal_robot_2):
+        self.non_animal_robot_2 = non_animal_robot_2
 
     def reassign_animal_robot_class(self, animal_robot, non_animal_robot_class_1, non_animal_robot_class_2):
         self.animal_robot = animal_robot
@@ -101,11 +104,30 @@ class Animal():
             self.animal_choice_1 = choice_1
             self.animal_choice_2 = choice_2
         return self.animal_choice_1, self.animal_choice_2
+
     def animal_makes_choice(self):
         '''FOR TESTING: Animal makes choice; randomly'''
         self.set_new_animal_choices()
         choice_list = [self.animal_choice_1, self.animal_choice_2]
-        return rand.choice(choice_lis)
+        return rand.choice(choice_list)
+
+    def change_animal_platform(self):
+        animal_robot_position = self.animal_makes_choice()
+        print('animal robot position:', animal_robot_position)
+        temp_animal_robot_class = self.animal_robot
+        temp_non_animal_robot_class_1 = self.non_animal_robot_1
+        temp_non_animal_robot_class_2 = self.non_animal_robot_2
+        print(temp_animal_robot_class, temp_non_animal_robot_class_1, temp_non_animal_robot_class_2)
+        if temp_non_animal_robot_class_1.position_vector == animal_robot_position:
+            self.animal_robot = temp_non_animal_robot_class_1
+            self.non_animal_robot_1 = temp_animal_robot_class
+            # self.non_animal_robot_2 remains unchanged as the mouse did not move there
+        elif temp_non_animal_robot_class_2.position_vector == animal_robot_position:
+            self.animal_robot = temp_non_animal_robot_class_2
+            self.non_animal_robot_2 = temp_animal_robot_class
+            # self.non_animal_robot_1 remains unchanged as the mouse did not move there
+        else: print('ERROR: No change in animal class was made')
+        return self.animal_robot, self.non_animal_robot_1, self.non_animal_robot_2
 
     def animal_makes_choice_DLC(self):
         '''Dummy function for where the animal chooses via integration with deeplabcut'''

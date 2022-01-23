@@ -58,10 +58,11 @@ class MazeRobot(PlatformRobot):
         self.maze = None
         # for encoding position relative to animal robot
         self.animal_robot = None
-        self.platform_robot = None
+        self.non_animal_robot = None
         self.animal_goal = None
         self.rel_position = self.get_relative_position(self.position_vector)
         # for precession method
+        self.precession_direction = None
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
         self.clockwise_step = [-1, -1, -1, 1, 1, 1]
         self.anticlockwise_dim = ['z', 'x', 'y', 'z', 'x', 'y']
@@ -73,8 +74,8 @@ class MazeRobot(PlatformRobot):
         # move list for robot steps
         self.move_list = None
 
-    def set_platform_robot(self, non_animal_robot_class):
-        self.platform_robot = non_animal_robot_class
+    def set_non_animal_robot(self, non_animal_robot_class):
+        self.non_animal_robot = non_animal_robot_class
 
     def set_animal_robot(self, animal_robot_class):
         self.animal_robot = animal_robot_class
@@ -98,23 +99,24 @@ class MazeRobot(PlatformRobot):
 
     def get_relative_position(self, vector):
         '''gets the relative position (encoded) between the animal and platform robot'''
-        x = vector[0]
-        y = vector[1]
-        z = vector[2]
-        if y == 0 and x > 0:
-            return 0
-        elif z == 0 and x > 0:
-            return 1
-        elif x == 0 and y < 0:
-            return 2
-        elif y == 0 and x < 0:
-            return 3
-        elif z == 0 and x < 0:
-            return 4
-        elif x == 0 and y > 0:
-            return 5
-        else:
-            print('Robot is off axis (its position is invalid because it is off axis), or robot is at origin')
+        if self.animal_robot != None:
+            x = vector[0] - self.animal_robot.position_vector[0]
+            y = vector[1] - self.animal_robot.position_vector[1]
+            z = vector[2] - self.animal_robot.position_vector[2]
+            if y == 0 and x > 0:
+                return 0
+            elif z == 0 and x > 0:
+                return 1
+            elif x == 0 and y < 0:
+                return 2
+            elif y == 0 and x < 0:
+                return 3
+            elif z == 0 and x < 0:
+                return 4
+            elif x == 0 and y > 0:
+                return 5
+            else:
+                print(f'Robot is off axis (its position is invalid because it is off axis), or robot is at origin.')
 
     def change_position(self, dimension, step):
         '''Move position vector around the board'''
@@ -144,23 +146,28 @@ class MazeRobot(PlatformRobot):
     def get_platform_rel_position_difference(self, vector):
         '''Gets the difference in rel_position between the non animal platform's position and the rel_position of the
          non animal platform's desired position'''
-        platform_rel_position = self.get_relative_position(self.get_relative_animal_vector())
+        platform_rel_position = self.get_relative_position(self.position_vector)
         target_platform_position = self.get_relative_position(vector)
-        return target_platform_position - platform_rel_position
+        print('target_platform_position', target_platform_position, 'platform_rel_position', platform_rel_position)
+        return (target_platform_position - platform_rel_position)%6
 
     def choose_precess_direction(self, vector):
         '''Deciedes whether to move clockwise or anticlockwise around the maze'''
         clockwise_steps = self.get_platform_rel_position_difference(vector)
+        print(clockwise_steps)
         if clockwise_steps == 0:
-            print('no movement required')
+            print('no movement required, however other non-animal robot must move opposite the long way around')
+            # self.non_animal_robot.precession_direction = self.non_animal_robot.choose_precess_direction
         elif 0 < clockwise_steps < 3:
-            return True
+            self.precession_direction = True
         elif 3 < clockwise_steps < 6:
-            return False
+            self.precession_direction = False
         elif clockwise_steps == 3:
-            print('choose another way to deicde of direction of precess')
+            print('must not be what the other robot has to do')
+            self.precession_direction = not self.non_animal_robot.choose_precess_direction
         else:
             print("haven't handled when rel_position < 6")
+        return self.precession_direction
 
     def move_to_outer_ring(self):
         '''move to outer ring'''
@@ -235,7 +242,7 @@ class MazeRobot(PlatformRobot):
         if self.position_vector == self.animal_robot.position_vector:
             print('ERROR: Robot is in Animal Robot')
             return False
-        elif self.position_vector == self.platform_robot.postion_vector:
+        elif self.position_vector == self.non_animal_robot.postion_vector:
             print('ERROR: Robot is in NonAnimalRobot')
             return False
         elif self.position_vector == self.animal_goal.position_vector:
