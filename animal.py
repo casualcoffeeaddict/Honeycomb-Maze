@@ -3,7 +3,8 @@ import random as rand
 import time
 
 class Animal():
-    def __init__(self, platform_class):
+    def __init__(self, platform_class, name):
+        self.name = name
         self.position_vector = platform_class.position_vector
         # references to other robots
         self.animal_robot = platform_class
@@ -115,11 +116,13 @@ class Animal():
             self.animal_choice_2 = choice_2
         return self.animal_choice_1, self.animal_choice_2
 
-    def animal_makes_choice(self):
+    def makes_random_choice(self):
         '''FOR TESTING: Animal makes choice; randomly'''
         self.set_new_animal_choices()
         choice_list = [self.animal_choice_1, self.animal_choice_2]
         return rand.choice(choice_list)
+
+
 
     def change_animal_platform(self, choice_method):
         '''Based on what choice the animal makes, the the robot which is the animal robot changes'''
@@ -128,7 +131,13 @@ class Animal():
         temp_animal_robot_class = self.animal_robot
         temp_non_animal_robot_class_1 = self.non_animal_robot_1
         temp_non_animal_robot_class_2 = self.non_animal_robot_2
-        print('start:', temp_animal_robot_class, temp_non_animal_robot_class_1, temp_non_animal_robot_class_2)
+        print('start:',
+              temp_animal_robot_class.name,
+              temp_non_animal_robot_class_1.name,
+              temp_non_animal_robot_class_2.name)
+        print('temp position vectors:',
+              temp_non_animal_robot_class_1.position_vector,
+              temp_non_animal_robot_class_2.position_vector)
         if temp_non_animal_robot_class_1.position_vector == animal_robot_position:
             self.animal_robot = temp_non_animal_robot_class_1
             self.non_animal_robot_1 = temp_animal_robot_class
@@ -138,7 +147,7 @@ class Animal():
             self.non_animal_robot_2 = temp_animal_robot_class
             # self.non_animal_robot_1 remains unchanged as the mouse did not move there
         else: print('ERROR: No change in animal class was made')
-        return self.animal_robot, self.non_animal_robot_1, self.non_animal_robot_2
+        return self.animal_robot.name, self.non_animal_robot_1.name, self.non_animal_robot_2.name
 
     def animal_makes_choice_DLC(self):
         '''Function for where the animal chooses via integration with deeplabcut'''

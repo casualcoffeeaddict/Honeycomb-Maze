@@ -52,8 +52,9 @@ class PlatformRobot():
 class MazeRobot(PlatformRobot):
     '''Class for the platform without the animal on it'''
 
-    def __init__(self, x, y, z, rotation):
+    def __init__(self, x, y, z, rotation, name):
         super().__init__(x, y, z, rotation)
+        self.name = name
         # for defining the boundaries of the maze
         self.maze = None
         # for encoding position relative to animal robot
@@ -212,14 +213,13 @@ class MazeRobot(PlatformRobot):
             print('select direction of precession')
         return precession_values
 
-    def get_path(self, target_vector):
-        '''Gets the path between the current position of the robot to the target position of the robot'''
+    def get_inner_ring_path(self, target_position):
+        '''Gets the path between the inner ring of the robot to the target position '''
         # move to outer ring
         move_to_outer_ring = self.move_to_outer_ring()
-        self.see_status()
         # precess around outer ring
-        clockwise = self.choose_precess_direction(target_vector)
-        precess_steps = self.get_platform_rel_position_difference(target_vector)
+        clockwise = self.choose_precess_direction(target_position)
+        precess_steps = self.get_platform_rel_position_difference(target_position)
         if clockwise == True:
             precess_steps = precess_steps
         elif clockwise == False:
@@ -232,6 +232,35 @@ class MazeRobot(PlatformRobot):
         move_to_inner_ring = self.move_to_inner_ring()
         return [*move_to_outer_ring, *precess, *move_to_inner_ring]
 
+    def get_outer_ring_path(self, target_position):
+        '''Get's path from outer ring to the desired position'''
+        # precess around outer ring
+        clockwise = self.choose_precess_direction(target_position)
+        precess_steps = self.get_platform_rel_position_difference(target_position)
+        if clockwise == True:
+            precess_steps = precess_steps
+        elif clockwise == False:
+            precess_steps = 6 - precess_steps
+        print('Clockwise:', clockwise,
+              '\nSteps:', precess_steps,
+              '\nStart:', self.position_vector)
+        precess = self.precession(clockwise, precess_steps, precess_radius=2)
+        # move to inner ring
+        move_to_inner_ring = self.move_to_inner_ring()
+        return [*precess, *move_to_inner_ring]
+
+    def get_path(self):
+        '''chooses between going from the inner ring and the outer ring based on the current location '''
+        animal_vector = self.get_relative_animal_vector()
+        inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
+        outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
+        if animal_vector in inner_ring:
+            self.get_inner_ring_path()
+        elif animal_vector in outer_list:
+            self.get_outer_ring_path()
+        else:
+            print('ERROR: The animal is outside the a radius of two from the animal robot')
+            
     def see_status(self):
         '''Get summary information about robot'''
         super().see_status()
