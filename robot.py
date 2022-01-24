@@ -118,8 +118,9 @@ class MazeRobot(PlatformRobot):
             else:
                 print(f'The robot {self} is off axis (its position is invalid because it is off axis), or robot is at origin.')
 
-    def animal_is_in_maze(self):
+    def platform_is_in_maze(self):
         '''Check if the position of the platform robot is inside the maze the robot is in'''
+        print()
         if self.maze != None:
             if self.position_vector in self.maze.valid_moves:
                 return True
@@ -269,10 +270,7 @@ class AnimalGoal(PlatformRobot):
 
 
 def main():
-    pr = AnimalRobot(0,0,0,'x')
-    print(
-        # pr.get_inner_ring(),
-        pr.get_new_animal_positions())
+
     inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
     outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
 

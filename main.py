@@ -44,8 +44,8 @@ mouse.set_non_animal_robot_2(robot3)
 def main():
     print(
         # mouse.see_mouse_status(),
-        mouse.change_animal_platform(mouse.animal_makes_choice())
-
+        mouse.change_animal_platform(mouse.animal_makes_choice()),
+        # mouse.see_mouse_status()
     )
     pass
 
