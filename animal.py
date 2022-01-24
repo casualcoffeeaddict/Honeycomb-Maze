@@ -31,9 +31,19 @@ class Animal():
             x += step
             y -= step
         else:
-            print('ERROR: Select correct dimension, either x, y, z')
+            print(f'ERROR: Select correct dimension for {self} either x, y, z')
         self.position_vector = [x, y, z]
         return self.position_vector
+
+    def see_mouse_status(self):
+        print(
+            'Animal Robot', self.animal_robot,
+            '\n Non-Animal Robot 2', self.non_animal_robot_1,
+            '\n Non-Animal RObot 2', self.non_animal_robot_2,
+            '\n Animal Goal', self.animal_goal,
+            '\n Animal Choice 1',  self.animal_choice_1,
+            '\n Animal Choice 2', self.animal_choice_2,
+        )
 
     def set_animal_goal(self, animal_goal_class):
         self.animal_goal = animal_goal_class
@@ -111,13 +121,14 @@ class Animal():
         choice_list = [self.animal_choice_1, self.animal_choice_2]
         return rand.choice(choice_list)
 
-    def change_animal_platform(self):
-        animal_robot_position = self.animal_makes_choice()
+    def change_animal_platform(self, choice_method):
+        '''Based on what choice the animal makes, the the robot which is the animal robot changes'''
+        animal_robot_position = choice_method
         print('animal robot position:', animal_robot_position)
         temp_animal_robot_class = self.animal_robot
         temp_non_animal_robot_class_1 = self.non_animal_robot_1
         temp_non_animal_robot_class_2 = self.non_animal_robot_2
-        print(temp_animal_robot_class, temp_non_animal_robot_class_1, temp_non_animal_robot_class_2)
+        print('start:', temp_animal_robot_class, temp_non_animal_robot_class_1, temp_non_animal_robot_class_2)
         if temp_non_animal_robot_class_1.position_vector == animal_robot_position:
             self.animal_robot = temp_non_animal_robot_class_1
             self.non_animal_robot_1 = temp_animal_robot_class
@@ -130,5 +141,5 @@ class Animal():
         return self.animal_robot, self.non_animal_robot_1, self.non_animal_robot_2
 
     def animal_makes_choice_DLC(self):
-        '''Dummy function for where the animal chooses via integration with deeplabcut'''
+        '''Function for where the animal chooses via integration with deeplabcut'''
         pass

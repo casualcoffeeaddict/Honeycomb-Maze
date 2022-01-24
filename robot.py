@@ -116,7 +116,16 @@ class MazeRobot(PlatformRobot):
             elif x == 0 and y > 0:
                 return 5
             else:
-                print(f'Robot is off axis (its position is invalid because it is off axis), or robot is at origin.')
+                print(f'The robot {self} is off axis (its position is invalid because it is off axis), or robot is at origin.')
+
+    def animal_is_in_maze(self):
+        '''Check if the position of the platform robot is inside the maze the robot is in'''
+        if self.maze != None:
+            if self.position_vector in self.maze.valid_moves:
+                return True
+            if self.position_vector not in self.maze.valid_moves:
+                print(f'ERROR: The platform, {self}, is not in the maze')
+                return False
 
     def change_position(self, dimension, step):
         '''Move position vector around the board'''
