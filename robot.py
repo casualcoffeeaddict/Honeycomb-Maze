@@ -260,7 +260,7 @@ class MazeRobot(PlatformRobot):
             self.get_outer_ring_path()
         else:
             print('ERROR: The animal is outside the a radius of two from the animal robot')
-            
+
     def see_status(self):
         '''Get summary information about robot'''
         super().see_status()

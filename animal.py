@@ -122,8 +122,6 @@ class Animal():
         choice_list = [self.animal_choice_1, self.animal_choice_2]
         return rand.choice(choice_list)
 
-
-
     def change_animal_platform(self, choice_method):
         '''Based on what choice the animal makes, the the robot which is the animal robot changes'''
         animal_robot_position = choice_method
