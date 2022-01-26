@@ -1,13 +1,17 @@
-'''Maze class for the robot to move around in'''
+"""Maze class for the robot to move around in"""
 
-class HexagonGrid():
-    '''Base maze class which defines the area of the maze'''
+
+class HexagonGrid:
+    """Base maze class which defines the area of the maze"""
+
     def __init__(self, column_number, row_number):
         self.columns = column_number
         self.rows = row_number
 
+
 class HexagonMaze(HexagonGrid):
-    '''Maze area for hexagonal platform'''
+    """Maze area for hexagonal platform"""
+
     def __init__(self, column_number, row_number):
         super().__init__(column_number, row_number)
         self.animal_robot = None
@@ -15,7 +19,7 @@ class HexagonMaze(HexagonGrid):
         self.non_animal_robot_1 = None
         self.non_animal_robot_2 = None
         # move list of class
-        self.valid_moves = self.set_move_list(self.hexagonal_useable_area())
+        self.valid_moves = None
 
     def set_animal_robot(self, animal_robot_class):
         self.animal_robot = animal_robot_class
@@ -29,11 +33,8 @@ class HexagonMaze(HexagonGrid):
     def set_non_animal_robot_2(self, non_animal_robot_class_2):
         self.non_animal_robot_1 = non_animal_robot_class_2
 
-    def set_move_list(self, map_type):
-        self.move_list = map_type
-
     def hexagonal_useable_area(self):
-        '''Maze are that can be used for hexagon style movement'''
+        """Maze are that can be used for hexagon style movement"""
 
         def get_range(num):
             if num % 2 == 1:
@@ -54,11 +55,11 @@ class HexagonMaze(HexagonGrid):
                     cubic_coordinates.append([x, y])
             return cubic_coordinates
 
-        def cube_to_axial_conversion(list):
+        def cube_to_axial_conversion(cube_coordinate_list):
             hexagonal_coordinates = []
-            for i in range(len(list)):
-                x1 = list[i][0]
-                y1 = list[i][1]
+            for i in range(len(cube_coordinate_list)):
+                x1 = cube_coordinate_list[i][0]
+                y1 = cube_coordinate_list[i][1]
                 x = int(y1)
                 y = int(x1 - (y1 - (y1 & 1)) / 2)
                 hexagonal_coordinates.append([x, y, -x - y])
@@ -67,12 +68,13 @@ class HexagonMaze(HexagonGrid):
         cubic_coordinate_list = generate_coordinates(self.rows, self.columns)
         return cube_to_axial_conversion(cubic_coordinate_list)
 
-    def circular_useable_area(self):
-        '''Maze area that can be used for circular stype of movement'''
-        circular_move_list = []
-        return circular_move_list
+    def set_map_type(self):
+        """Decided if the map is uses circular or hexagonal platforms"""
+
 
 def main():
     pass
+
+
 if __name__ == '__main__':
     main()
