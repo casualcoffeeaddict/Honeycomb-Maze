@@ -52,6 +52,7 @@ def main():
         # robot2.animal_robot.position_vector,
         # robot2.relative_position,
         # robot2.animal_robot.position_vector[1],
+        # robot2.change_position('x', 2)
         robot2.get_path(),  # or animal choice 2 - how will this decision be made?
         # mouse.change_animal_platform(mouse.makes_random_choice())
 

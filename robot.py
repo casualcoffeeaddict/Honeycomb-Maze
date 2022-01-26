@@ -127,7 +127,7 @@ class MazeRobot(PlatformRobot):
 
     def get_vector_relative_position(self, vector):
         """gets the relative position of a vector and the animal robot"""
-        if self.animal_robot != None:
+        if self.animal_robot is not None:
             x = vector[0] - self.animal_robot.position_vector[0]
             y = vector[1] - self.animal_robot.position_vector[1]
             z = vector[2] - self.animal_robot.position_vector[2]
@@ -161,25 +161,28 @@ class MazeRobot(PlatformRobot):
     def change_position(self, dimension, step):
         """Move position vector around the board"""
         rotation_check = self.dimension_dict[dimension]
+        print('change position, self.position_vector', self.position_vector)
         if self.rotation != dimension:
             change = self.dimension_dict[dimension] - self.rotation
             self.change_rotation(change)
-        x, y, z = self.position_vector
+        x = self.position_vector[0]
+        y = self.position_vector[1]
+        z = self.position_vector[2]
         if dimension == 'x' and self.rotation == rotation_check:
             y += step
             z -= step
             self.position_vector = [x, y, z]
-            return [self.position_vector, self.rotation]
+            return self.position_vector
         elif dimension == 'y' and self.rotation == rotation_check:
             x += step
             z -= step
             self.position_vector = [x, y, z]
-            return [self.position_vector, self.rotation]
+            return self.position_vector
         elif dimension == 'z' and self.rotation == rotation_check:
             x += step
             y -= step
             self.position_vector = [x, y, z]
-            return [self.position_vector, self.rotation]
+            return self.position_vector
         else:
             print('ERROR: Select correct dimension, either x, y, z')
 
@@ -188,7 +191,6 @@ class MazeRobot(PlatformRobot):
          non animal platform's desired position"""
         self.update_relative_position()
         target_platform_position = self.get_vector_relative_position(vector)
-        print('target_platform_position', target_platform_position, 'platform_rel_position', platform_rel_position)
         return (target_platform_position - self.relative_position)%6
 
     def choose_precess_direction(self, vector):
@@ -225,21 +227,23 @@ class MazeRobot(PlatformRobot):
     def precession(self, clockwise, precess_steps, precess_radius):
         """direction of precession, start position, and number of steps"""
         precession_values = []
-        print('no of steps in precession:', precess_steps)
+        print('precession, no of steps in precession:', precess_steps)
         if clockwise == True:
             # precess clockwise
             for i in range(0, precess_steps):
                 self.position_vector = self.change_position(self.clockwise_dim[self.relative_position],
-                                                            self.clockwise_step[self.relative_position * precess_radius])
+                                                                self.clockwise_step[self.relative_position] * precess_radius)
                 precession_values.append(self.position_vector)
+            print('preccession, self.position_vector', self.position_vector)
         elif not clockwise:
             # precess anticlockwise
             for i in range(0, precess_steps):
                 self.position_vector = self.change_position(self.anticlockwise_dim[self.relative_position],
-                                                            self.anticlockwise_step[self.relative_position * precess_radius])
+                                                            self.anticlockwise_step[self.relative_position] * precess_radius)
                 precession_values.append(self.position_vector)
+            print(self.position_vector)
         else:
-            print('select direction of precession')
+            print('ERROR: Please select direction of precession')
         return precession_values
 
     def get_inner_ring_path(self, target_position):
@@ -247,7 +251,7 @@ class MazeRobot(PlatformRobot):
         # move to outer ring
         move_to_outer_ring = self.move_to_outer_ring()
         # precess around outer ring
-        move_to_inner_ring = self.get_outer_ring_path(self)
+        move_to_inner_ring = self.get_outer_ring_path(target_position)
         return [*move_to_outer_ring, *move_to_inner_ring]
 
     def get_outer_ring_path(self, target_position):
