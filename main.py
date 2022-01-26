@@ -46,9 +46,12 @@ def main_loop():
 def main():
 
     print(
-
-        robot2.get_path(mouse.animal_choice_1), # or animal choice 2 - how will this decision be made?
-        mouse.change_animal_platform(mouse.makes_random_choice())
+        robot2.relative_position,
+        robot2.animal_robot.position_vector,
+        robot2.update_relative_position(), '\n',
+        robot2.relative_position,
+        # robot2.get_path(), # or animal choice 2 - how will this decision be made?
+        # mouse.change_animal_platform(mouse.makes_random_choice())
 
     )
     pass

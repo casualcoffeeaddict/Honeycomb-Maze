@@ -52,7 +52,7 @@ class PlatformRobot():
 class MazeRobot(PlatformRobot):
     '''Class for the platform without the animal on it'''
 
-    def __init__(self, x, y, z, rotation, name):
+    def __init__(self, x, y, z, rotation, *name):
         super().__init__(x, y, z, rotation)
         self.name = name
         # for defining the boundaries of the maze
@@ -61,7 +61,8 @@ class MazeRobot(PlatformRobot):
         self.animal_robot = None
         self.non_animal_robot = None
         self.animal_goal = None
-        self.rel_position = self.get_relative_position(self.position_vector)
+        self.relative_position = None
+        # self.update_relative_position(self.animal_robot)
         # for precession method
         self.precession_direction = None
         self.clockwise_dim = ['x', 'y', 'z', 'x', 'y', 'z']
@@ -74,6 +75,9 @@ class MazeRobot(PlatformRobot):
         self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
         # move list for robot steps
         self.move_list = None
+        # ring list
+        self.inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
+        self.outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
 
     def set_non_animal_robot(self, non_animal_robot_class):
         self.non_animal_robot = non_animal_robot_class
@@ -98,26 +102,28 @@ class MazeRobot(PlatformRobot):
         '''Return vector between two the animal_robot and robot'''
         return [a - b for a, b in zip(self.animal_robot.position_vector, self.position_vector)]
 
-    def get_relative_position(self, vector):
-        '''gets the relative position (encoded) between the animal and platform robot'''
+    def update_relative_position(self,):
+        '''gets the relative position (encoded) between the animal and platform robot and sets the self.rel_position
+        this value'''
         if self.animal_robot != None:
-            x = vector[0] - self.animal_robot.position_vector[0]
-            y = vector[1] - self.animal_robot.position_vector[1]
-            z = vector[2] - self.animal_robot.position_vector[2]
+            x = self.position_vector[0] - self.animal_robot.position_vector[0]
+            y = self.position_vector[1] - self.animal_robot.position_vector[1]
+            z = self.position_vector[2] - self.animal_robot.position_vector[2]
             if y == 0 and x > 0:
-                return 0
+                self.relative_position = 0
             elif z == 0 and x > 0:
-                return 1
+                self.relative_position = 1
             elif x == 0 and y < 0:
-                return 2
+                self.relative_position = 2
             elif y == 0 and x < 0:
-                return 3
+                self.relative_position = 3
             elif z == 0 and x < 0:
-                return 4
+                self.relative_position = 4
             elif x == 0 and y > 0:
-                return 5
+                self.relative_position = 5
             else:
                 print(f'The robot {self} is off axis (its position is invalid because it is off axis), or robot is at origin.')
+
 
     def platform_is_in_maze(self):
         '''Check if the position of the platform robot is inside the maze the robot is in'''
@@ -183,14 +189,14 @@ class MazeRobot(PlatformRobot):
     def move_to_outer_ring(self):
         '''move to outer ring'''
         outer_ring_move = [
-            self.change_position(self.ring_dim[self.rel_position],
-                                 self.outer_ring_steps[self.rel_position])]
+            self.change_position(self.ring_dim[self.relative_position],
+                                 self.outer_ring_steps[self.relative_position])]
         return outer_ring_move
 
     def move_to_inner_ring(self):
         '''move to inner ring'''
         inner_ring_move = [
-            self.change_position(self.ring_dim[self.rel_position], self.inner_ring_steps[self.rel_position])]
+            self.change_position(self.ring_dim[self.relative_position], self.inner_ring_steps[self.relative_position])]
         return inner_ring_move
 
     def precession(self, clockwise, precess_steps, precess_radius):
@@ -200,14 +206,14 @@ class MazeRobot(PlatformRobot):
         if clockwise == True:
             # precess clockwise
             for i in range(0, precess_steps):
-                self.position_vector = self.change_position(self.clockwise_dim[self.rel_position],
-                                                            self.clockwise_step[self.rel_position * precess_radius])
+                self.position_vector = self.change_position(self.clockwise_dim[self.relative_position],
+                                                            self.clockwise_step[self.relative_position * precess_radius])
                 precession_values.append(self.position_vector)
         elif not clockwise:
             # precess anticlockwise
             for i in range(0, precess_steps):
-                self.position_vector = self.change_position(self.anticlockwise_dim[self.rel_position],
-                                                            self.anticlockwise_step[self.rel_position * precess_radius])
+                self.position_vector = self.change_position(self.anticlockwise_dim[self.relative_position],
+                                                            self.anticlockwise_step[self.relative_position * precess_radius])
                 precession_values.append(self.position_vector)
         else:
             print('select direction of precession')
@@ -218,19 +224,8 @@ class MazeRobot(PlatformRobot):
         # move to outer ring
         move_to_outer_ring = self.move_to_outer_ring()
         # precess around outer ring
-        clockwise = self.choose_precess_direction(target_position)
-        precess_steps = self.get_platform_rel_position_difference(target_position)
-        if clockwise == True:
-            precess_steps = precess_steps
-        elif clockwise == False:
-            precess_steps = 6 - precess_steps
-        print('Clockwise:', clockwise,
-              '\nSteps:', precess_steps,
-              '\nStart:', self.position_vector)
-        precess = self.precession(clockwise, precess_steps, precess_radius=2)
-        # move to inner ring
-        move_to_inner_ring = self.move_to_inner_ring()
-        return [*move_to_outer_ring, *precess, *move_to_inner_ring]
+        move_to_inner_ring = self.get_outer_ring_path(self, target_position)
+        return [*move_to_outer_ring, *move_to_inner_ring]
 
     def get_outer_ring_path(self, target_position):
         '''Get's path from outer ring to the desired position'''
@@ -252,12 +247,12 @@ class MazeRobot(PlatformRobot):
     def get_path(self):
         '''chooses between going from the inner ring and the outer ring based on the current location '''
         animal_vector = self.get_relative_animal_vector()
-        inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
-        outer_list = [[2, 0, -2], [2, -2, 0], [0, -2, 2], [-2, 0, 2], [-2, 2, 0], [0, 2, -2]]
-        if animal_vector in inner_ring:
-            self.get_inner_ring_path()
-        elif animal_vector in outer_list:
-            self.get_outer_ring_path()
+        if animal_vector in self.inner_ring:
+            print('in inner ring')
+            self.get_inner_ring_path(self.get_relative_animal_vector())
+        elif animal_vector in self.outer_list:
+            print('in outer ring')
+            self.get_outer_ring_path(self.get_relative_animal_vector())
         else:
             print('ERROR: The animal is outside the a radius of two from the animal robot')
 
@@ -265,7 +260,7 @@ class MazeRobot(PlatformRobot):
         '''Get summary information about robot'''
         super().see_status()
         print(
-            f'Relative Position: {self.rel_position}\n'
+            f'Relative Position: {self.relative_position}\n'
         )
 
     def is_in_maze(self):

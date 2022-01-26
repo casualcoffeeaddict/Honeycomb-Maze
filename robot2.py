@@ -14,3 +14,6 @@ print(not None)
     #         # move y dim
     #     elif self.rotation == 2:
     #         # move z dim
+
+def first_move_valid(self):
+    '''Check if the first move for the robot is valid based on the position of the other robot'''
