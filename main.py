@@ -1,4 +1,4 @@
-'''Main Maze program that will move the robots around'''
+"""Main Maze program that will move the robots around"""
 
 from robot import *
 from maze import *
@@ -32,6 +32,7 @@ mouse.set_animal_robot(robot1)
 mouse.set_non_animal_robot_1(robot2)
 mouse.set_non_animal_robot_2(robot3)
 
+
 def main_loop():
     # animal is on platform - done in instantiation
     # platform moves to new position
@@ -43,14 +44,15 @@ def main_loop():
     # the
     pass
 
-def main():
 
+def main():
+    robot2.update_relative_position()
     print(
-        robot2.relative_position,
-        robot2.animal_robot.position_vector,
-        robot2.update_relative_position(), '\n',
-        robot2.relative_position,
-        # robot2.get_path(), # or animal choice 2 - how will this decision be made?
+        # robot2.relative_position,
+        # robot2.animal_robot.position_vector,
+        # robot2.relative_position,
+        # robot2.animal_robot.position_vector[1],
+        robot2.get_path(),  # or animal choice 2 - how will this decision be made?
         # mouse.change_animal_platform(mouse.makes_random_choice())
 
     )
