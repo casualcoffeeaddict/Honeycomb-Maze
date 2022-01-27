@@ -205,7 +205,7 @@ class MazeRobot(PlatformRobot):
         """Change the encoded orientation of the platform. Is between 0-2"""
         if self.is_valid_rotation_change():
             self.rotation += change
-        if self.is_valid_rotation_change() == False:
+        if not self.is_valid_rotation_change():
             print('ERROR: This move is not position as the robot can not rotate, since consecutive to other robots')
         return self.rotation // 3
 
@@ -349,7 +349,8 @@ class AnimalGoal(PlatformRobot):
 
 
 def main():
-   pass
+    pass
+
 
 if __name__ == '__main__':
     main()

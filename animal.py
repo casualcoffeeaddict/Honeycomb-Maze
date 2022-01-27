@@ -85,7 +85,7 @@ class Animal:
             inner_ring_list.append(self.change_position(self.inner_ring_dim[i], self.inner_ring_steps[i]))
         return inner_ring_list
 
-    def get_new_animal_positions(self):
+    def get_random_new_animal_positions(self):
         """FOR TESTING: Gets two random positions from the inner ring of the AnimalRobot that the NonAnimalRobots
         are not occupying"""
         inner_ring_list = self.get_inner_ring()
@@ -106,9 +106,9 @@ class Animal:
 
     def set_new_animal_choices(self):
         """Get choices for the animal to decide to move to"""
-        choice_1, choice_2 = self.get_new_animal_positions()
+        choice_1, choice_2 = self.get_random_new_animal_positions()
         if choice_1 == choice_2:
-            self.get_new_animal_positions()
+            self.get_random_new_animal_positions()
             self.set_new_animal_choices()
         else:
             self.animal_choice_1 = choice_1

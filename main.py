@@ -33,8 +33,6 @@ mouse.set_non_animal_robot_1(robot2)
 mouse.set_non_animal_robot_2(robot3)
 
 
-
-
 def main_loop():
     # set relative position of the robots that are instantiated
     robot1.update_relative_position()
@@ -65,10 +63,6 @@ def main():
         # robot2.precession(True, 6, 2),
         robot2.get_path(),  # or animal choice 2 - how will this decision be made?
         # mouse.change_animal_platform(mouse.makes_random_choice())
-
-
-
-
 
         robot3.is_valid_rotation_change()
     )

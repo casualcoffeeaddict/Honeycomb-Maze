@@ -71,6 +71,14 @@ class HexagonMaze(HexagonGrid):
     def set_map_type(self):
         """Decided if the map is uses circular or hexagonal platforms"""
 
+    def choose_new_non_animal_platform_positions(self):
+        """Choose the new positions of the non-animal platforms in the maze; they will be consecutive to the
+        animal robot's position"""
+        #get list of consecutive positions of the animal robot
+        # remove the current positions of the non-animal platforms
+        
+        pass
+
 
 def main():
     pass
