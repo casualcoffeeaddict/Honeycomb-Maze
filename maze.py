@@ -80,6 +80,26 @@ class HexagonMaze(HexagonGrid):
         pass
 
 
+
+
+
+    def get_pathfinding_target(self):
+        """From the actual target, get the pathfinding target"""
+        return [x,y,z]
+
+    def get_pathfinding_start(self):
+        """From the actual start pathfinding start"""
+        return [x,y,z]
+    
+    def get_valid_move_list(self):
+        """Based on the position of the robots, remove the invalid that the robot can not move to without
+         rotation problems"""
+        valid_move_list = []
+        return valid_move_list
+
+
+
+
 def main():
     pass
 
