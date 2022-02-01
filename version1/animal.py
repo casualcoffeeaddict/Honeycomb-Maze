@@ -6,12 +6,16 @@ class Animal:
     def __init__(self, platform_class, name):
         self.name = name
         self.position_vector = platform_class.position_vector
+        # position information for interacting with the maze
+        self.network_position = self.get_network_position()
         # references to other robots
         self.animal_robot = platform_class
         self.non_animal_robot_1 = None
         self.non_animal_robot_2 = None
         # animal goal
         self.animal_goal = None
+        # Is the animal robot
+        self.is_animal_robot = None
         # the choice of platforms the animal can choose to go to
         self.animal_choice_1 = None
         self.animal_choice_2 = None
@@ -35,6 +39,10 @@ class Animal:
             print(f'ERROR: Select correct dimension for {self} either x, y, z')
         self.position_vector = [x, y, z]
         return self.position_vector
+
+    def get_network_position(self):
+        """Get the position of the robot in correct format for the maze to read"""
+        return [self.position_vector[0], self.position_vector[1]]
 
     def see_mouse_status(self):
         print(

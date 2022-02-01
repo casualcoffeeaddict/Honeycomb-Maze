@@ -84,6 +84,7 @@ class MazeRobot(PlatformRobot):
 
     def set_maze(self, maze_class):
         self.maze = maze_class
+        self.maze.add_robot(self)
 
     def set_animal_goal(self, animal_goal_class):
         self.animal_goal = animal_goal_class

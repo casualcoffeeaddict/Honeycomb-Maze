@@ -2,7 +2,10 @@
 
 from robot import *
 from maze import *
-from animal import *
+from version1.animal import *
+
+# instantiate maze
+hm = HexagonMaze(11, 10)
 
 # instantiate objects from classes
 robot1 = MazeRobot(0, 0, 0, 'x', 'robot1')  # instantiate robot1
@@ -10,8 +13,7 @@ robot2 = MazeRobot(-2, 2, 0, 'x', 'robot2')  # instantiate robot2
 robot3 = MazeRobot(-1, 0, 1, 'x', 'robot3')  # instantiate robot3
 mouse = Animal(robot1, 'mouse')  # instantiate animal with the platform it is on
 goal = AnimalGoal(2, 0, -2, 'x')  # instantiate animal goal
-# instantiate maze
-hm = HexagonMaze(11, 10)
+
 # instantiate goal
 
 # setting the parameters
@@ -23,7 +25,7 @@ robot3.set_maze(hm)
 robot2.set_animal_robot(robot1)
 robot3.set_animal_robot(robot1)
 mouse.set_animal_goal(goal)
-# tell non animal robots about each other
+# tell non-animal robots about each other
 robot2.set_non_animal_robot(robot3)
 robot3.set_non_animal_robot(robot2)
 

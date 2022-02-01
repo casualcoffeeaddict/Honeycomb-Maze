@@ -1,5 +1,5 @@
 """Maze class for the robot to move around in"""
-
+import networkx as nx
 
 class HexagonGrid:
     """Base maze class which defines the area of the maze"""
@@ -14,24 +14,31 @@ class HexagonMaze(HexagonGrid):
 
     def __init__(self, column_number, row_number):
         super().__init__(column_number, row_number)
-        self.animal_robot = None
-        self.animal_goal = None
-        self.non_animal_robot_1 = None
-        self.non_animal_robot_2 = None
+        # self.animal_robot = None
+        # self.animal_goal = None
+        # self.non_animal_robot_1 = None
+        # self.non_animal_robot_2 = None
+        #
+        self.robot_list = []
         # move list of class
         self.valid_moves = None
+        # networkx grid
+        self.movement_network = None
 
-    def set_animal_robot(self, animal_robot_class):
-        self.animal_robot = animal_robot_class
+    # def set_animal_robot(self, animal_robot_class):
+    #     self.animal_robot = animal_robot_class
+    #
+    # def set_animal_goal(self, animal_goal_class):
+    #     self.animal_goal = animal_goal_class
+    #
+    # def set_non_animal_robot_1(self, non_animal_robot_class_1):
+    #     self.non_animal_robot_1 = non_animal_robot_class_1
+    #
+    # def set_non_animal_robot_2(self, non_animal_robot_class_2):
+    #     self.non_animal_robot_1 = non_animal_robot_class_2
 
-    def set_animal_goal(self, animal_goal_class):
-        self.animal_goal = animal_goal_class
-
-    def set_non_animal_robot_1(self, non_animal_robot_class_1):
-        self.non_animal_robot_1 = non_animal_robot_class_1
-
-    def set_non_animal_robot_2(self, non_animal_robot_class_2):
-        self.non_animal_robot_1 = non_animal_robot_class_2
+    def add_robot(self, robot):
+        self.robot_list.append(robot)
 
     def hexagonal_useable_area(self):
         """Maze are that can be used for hexagon style movement"""
@@ -68,37 +75,37 @@ class HexagonMaze(HexagonGrid):
         cubic_coordinate_list = generate_coordinates(self.rows, self.columns)
         return cube_to_axial_conversion(cubic_coordinate_list)
 
-    def set_map_type(self):
-        """Decided if the map is uses circular or hexagonal platforms"""
+    def generate_hexgrid_network(self):
+        """Makes a grid of appropriate size with all the points in it"""
+        self.movement_network = nx.triangular_lattice_graph(self.rows, self.columns, False, True)
+
+    def get_consecutive_positions(self):
+        """From the robot positions, select the consecutive positions from the network"""
+        pass
+
+    def remove_consecutive_positions(self):
+        """Remove the positions that are consecutive to the robots and update self.movement_network"""
+        pass
 
     def choose_new_non_animal_platform_positions(self):
         """Choose the new positions of the non-animal platforms in the maze; they will be consecutive to the
-        animal robot's position"""
-        #get list of consecutive positions of the animal robot
-        # remove the current positions of the non-animal platforms
-        
+        animal robot's position (from the inner ring of the animal robot"""
         pass
-
-
-
-
 
     def get_pathfinding_target(self):
         """From the actual target, get the pathfinding target"""
-        return [x,y,z]
+        return [x,y]
 
     def get_pathfinding_start(self):
-        """From the actual start pathfinding start"""
-        return [x,y,z]
-    
-    def get_valid_move_list(self):
-        """Based on the position of the robots, remove the invalid that the robot can not move to without
-         rotation problems"""
-        valid_move_list = []
-        return valid_move_list
+        """From the actual position of the animal robot pathfinding start"""
+        return [x,y]
 
-
-
+    def pathfinder(self):
+        """get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
+        algorithm """
+        start = self.get_pathfinding_start()
+        target = self.get_pathfinding_target()
+        return nx.shortest_path(self.movement_network, source=start, target=target)
 
 def main():
     pass
