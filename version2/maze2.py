@@ -1,12 +1,14 @@
 """Maze class"""
 import networkx as nx
 
+
 class HexagonGrid:
     """Base maze class which defines the area of the maze"""
 
     def __init__(self, column_number, row_number):
         self.columns = column_number
         self.rows = row_number
+
 
 class HexagonMaze(HexagonGrid):
     """Maze area for hexagonal platform"""
@@ -15,6 +17,7 @@ class HexagonMaze(HexagonGrid):
         super().__init__(column_number, row_number)
         # List of the object names of the robots that are present in the maze
         self.robot_list = []
+        self.animal_list = []
         # move list of class
         self.valid_moves = None
         # animal goal
@@ -30,6 +33,9 @@ class HexagonMaze(HexagonGrid):
 
     def add_robot(self, robot):
         self.robot_list.append(robot)
+
+    def add_animal(self, animal):
+        self.animal_list.append(animal)
 
     def generate_hexgrid_network(self):
         """Makes a grid of appropriate size with all the points in it"""
@@ -88,6 +94,14 @@ class HexagonMaze(HexagonGrid):
         animal robot's position (from the inner ring of the animal robot)"""
         pass
 
+    def get_non_animal_class(self):
+        """Returns list of the non-animal class objects from self.robot_list"""
+        output = []
+        for robot in self.robot_list:
+            if robot.is_animal_robot == False:
+                output.append(robot)
+        return output
+
     def get_animal_robot_position_vector(self):
         for robot in self.robot_list:
             if robot.is_animal_robot == True:
@@ -104,7 +118,6 @@ class HexagonMaze(HexagonGrid):
                                                                            non_animal_robot_position_vector)
         return non_animal_robot.move_to_outer_ring(non_animal_robot_position_vector, non_animal_robot_rel_position)
 
-
     def get_pathfinding_target(self, non_animal_robot):
         """From the actual position of the animal robot pathfinding start"""
         animal_robot_position_vector = self.get_animal_robot_position_vector()
@@ -112,7 +125,6 @@ class HexagonMaze(HexagonGrid):
         target_relative_position = non_animal_robot.relative_position(animal_robot_position_vector,
                                                                       target_position_vector)
         return non_animal_robot.move_to_outer_ring(target_position_vector, target_relative_position)
-
 
     def pathfinder(self, non_animal_robot):
         """Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining

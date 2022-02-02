@@ -18,8 +18,9 @@ class HexagonMaze(HexagonGrid):
         # self.animal_goal = None
         # self.non_animal_robot_1 = None
         # self.non_animal_robot_2 = None
-        #
+        # object lists
         self.robot_list = []
+        self.animal_list = []
         # move list of class
         self.valid_moves = None
         # networkx grid
@@ -39,6 +40,9 @@ class HexagonMaze(HexagonGrid):
 
     def add_robot(self, robot):
         self.robot_list.append(robot)
+
+    def add_animal(self, animal):
+        self.animal_list.append(animal)
 
     def hexagonal_useable_area(self):
         """Maze are that can be used for hexagon style movement"""

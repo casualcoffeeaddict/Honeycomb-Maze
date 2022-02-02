@@ -9,11 +9,17 @@ hm = HexagonMaze(column_number=10, row_number=11)
 robot1 = PlatformRobot(4, 6, -10, 1, 'robot1')
 robot2 = PlatformRobot(3, 5, -8, 1, 'robot2')
 robot3 = PlatformRobot(3, 6, -9, 1, 'robot3')
+# Instantiate animal
+mouse = Animal()
 
-# Set the maze
+# Set the maze (and add robots to maze class)
 robot1.set_maze(hm)
 robot2.set_maze(hm)
 robot3.set_maze(hm)
+
+mouse.set_maze(hm)
+
+
 
 
 def main():
