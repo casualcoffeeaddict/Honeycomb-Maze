@@ -1,5 +1,4 @@
 """Animal Class"""
-
 from random import choice
 
 
@@ -25,15 +24,25 @@ class Animal:
 
     def make_random_movement_choice(self):
         """Makes random choice of platform to move to"""
-        movement_choices = self.maze.get_non_animal_class()
+        movement_choices = self.maze.get_non_animal_robot_class()
         return choice(movement_choices)
 
-    def change_animal_class(self, choice_method=make_random_movement_choice):
+    def change_animal_class(self, new_animal_class):
         """Based on choice (random by default) , change the class of the animal robot and non animal robot"""
-        new_animal_robot = choice_method
+        new_animal_class.is_animal_robot
 
         for robot in self.maze.robot_list:
-            robot.is_animal_robot = False
+            if robot.is_animal_robot == 'AR' and new_animal_class == self:
+                robot.is_animal_robot = 'AR'
+            if robot.is_animal_robot == 'AR' and new_animal_class != self:
+                robot.is_animal_robot = 'NAR'
 
-        new_animal_robot.is_animal_robot = True
-        self.set_animal_position()
+            if robot.is_animal_robot == 'NAR' and new_animal_class == self:
+                robot.is_animal_robot = 'AR'
+            if robot.is_animal_robot == 'NAR' and new_animal_class != self:
+                robot.is_animal_robot = 'NNAR'
+
+            if robot.is_animal_robot == 'NNAR' and new_animal_class == self:
+                robot.is_animal_robot = 'AR'
+            if robot.is_animal_robot == 'NNAR' and new_animal_class != self:
+                robot.is_animal_robot = 'NNAR'

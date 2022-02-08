@@ -66,10 +66,10 @@ def excluded_platforms():
     pass
 
 def test():
-    a = Hex(0, +1, -1)
-    b = Hex(3, 10, -13)
+    a = Hex(4,6,-10)
+    b = Hex(3, 6, -9)
 
-    print(path_between_points(a, b))
+    print(inner_ring(b))
     # print(select_target_location(a))
 
 if __name__ == '__main__':
