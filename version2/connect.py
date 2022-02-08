@@ -22,9 +22,24 @@ SSHClient.connect('192.168.0.105',
                   passphrase=None,
                   disabled_algorithms=None)
 
-ssh = paramiko.SSHClient()
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('192.168.0.105', username='root', password='')
 
-stdin, stdout, sterr = ssh.exec_command('./lineFollowJunction4 1 2 2 2 2 2 2')
+
+robot1 = paramiko.SSHClient()
+robot1.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+robot1.connect('192.168.0.103', username='root', password='')
+
+robot2 = paramiko.SSHClient()
+robot2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+robot2.connect('192.168.0.104', username='root', password='')
+
+robot3 = paramiko.SSHClient()
+robot3.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+robot3.connect('192.168.0.105', username='root', password='')
+
+# send commands to robots
+stdin, stdout, sterr = robot1.exec_command('./lineFollowJunction4 1 2 2 2 2 2 2')
+
+stdin, stdout, sterr = robot2.exec_command('./lineFollowJunction4 1 2 2 2 2 2 2')
+
+stdin, stdout, sterr = robot3.exec_command('./lineFollowJunction4 1 2 2 2 2 2 2')
 # lineFollowJunction4 is the program on the robot, in this case 2 2... are the inputs

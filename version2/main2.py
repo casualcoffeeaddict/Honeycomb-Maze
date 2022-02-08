@@ -52,15 +52,7 @@ def main():
     robot2.target_position = (5, 6, -11)
     move = hm.pathfinder_loop_1(robot2)
     print(
-        # hm.make_temp_movement_network(robot2),
-        # robot2.set_target_position(),
-        # hm.get_pathfinding_target(robot2)
-        # hm.pathfinder(robot2)
-        # move,
-        # robot2.make_command_list(move)
-        robot2.position_vector
-        # hm.pathfinder_loop_2(robot2)
-        # robot2.animal_relative_position(robot2.target_position)
+     move
     )
 
 

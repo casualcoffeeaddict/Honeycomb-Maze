@@ -221,7 +221,7 @@ class HexagonMaze(HexagonGrid):
         # path find around this network to final outer ring positions
         path = self.pathfinder(moving_robot_class)
 
-        return [*path]
+        return self.moving_robot_class.make_command_list(path)
 
     def pathfinder_loop_2(self, moving_robot_class):
         """Move both non-animal robots (NAR & NNAR) to the inner ring at the same time"""

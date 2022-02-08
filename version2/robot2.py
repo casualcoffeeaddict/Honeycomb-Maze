@@ -259,8 +259,7 @@ class PlatformRobot:
             elif self.direction != self.path_relative_position(move, self.position_vector):
                 turns = self.turn_robot(move)
                 # make turns more efficient - quick fix
-                turn_dict = {0: 0, 1: 1, 2: 2, 3: 3, 4: -2, 5: -1}
-                command_list.append(turn_dict[turns])
+                command_list.append(turns)
                 # update the direction of the robot (ie add the number of turns it makes to the direction
                 # then remainder 6)
                 self.direction += turns
