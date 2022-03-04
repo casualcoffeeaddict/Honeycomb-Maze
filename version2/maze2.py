@@ -173,17 +173,17 @@ class HexagonMaze(HexagonGrid):
     def pathfinder(self, non_animal_robot):
         """Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
         algorithm """
-
+        print(non_animal_robot.name)
         def get_pathfinding_start(non_animal_robot):
             """From the position of the animal robot, find the starting position for pathfinding"""
             return non_animal_robot.position_vector
 
         def get_pathfinding_target(non_animal_robot):
             """From the actual target, find the position of the pathfinding target"""
-            print('Target Position', non_animal_robot.target_position)
+            print('Target Position:', non_animal_robot.target_position)
 
             target_rel_position = non_animal_robot.animal_relative_position(non_animal_robot.target_position)
-            print('Target relative position', target_rel_position)
+            print('Target relative position:', target_rel_position)
 
             inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
             movement = inner_ring[target_rel_position]
@@ -200,6 +200,8 @@ class HexagonMaze(HexagonGrid):
         start = get_pathfinding_start(non_animal_robot)
         target = get_pathfinding_target(non_animal_robot)
 
+
+        self.remove_consecutive_positions()
         network = list(self.temp_movement_network.nodes)
 
         # print('Nodes in network', network)
@@ -221,7 +223,7 @@ class HexagonMaze(HexagonGrid):
         # path find around this network to final outer ring positions
         path = self.pathfinder(moving_robot_class)
 
-        return self.moving_robot_class.make_command_list(path)
+        return moving_robot_class.make_command_list(path)
 
     def pathfinder_loop_2(self, moving_robot_class):
         """Move both non-animal robots (NAR & NNAR) to the inner ring at the same time"""

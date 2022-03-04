@@ -6,9 +6,9 @@ from robot2 import *
 # Instantiate maze
 hm = HexagonMaze(column_number=15, row_number=15)
 # Instantiate robots
-robot1 = PlatformRobot(4, 6, -10, 1, 'robot1')
-robot2 = PlatformRobot(3, 5, -8, 2, 'robot2')
-robot3 = PlatformRobot(3, 6, -9, 1, 'robot3')
+robot1 = PlatformRobot(3, 5, -8, 1, 'robot1')
+robot2 = PlatformRobot(2, 5, -7, 2, 'robot2')
+robot3 = PlatformRobot(3, 4, -7, 1, 'robot3')
 
 # Instantiate animal with its maze
 mouse = Animal(hm)
@@ -49,11 +49,29 @@ def flatten(t):
 
 def main():
     robot3.is_animal_robot = 'NAR'
-    robot2.target_position = (5, 6, -11)
-    move = hm.pathfinder_loop_1(robot2)
-    print(
-     move
-    )
+    robot2.target_position = (5, 4, -9)
+    robot3.target_position = (4, 4, -8)
+
+    # print(hm.get_animal_robot_class().position_vector)
+    # print(hm.get_non_animal_robot_class().position_vector)
+    # print(hm.get_non_non_animal_robot_class().position_vector)
+    # print('1', robot2.position_vector)
+    # robot2.step_back_from_NAR()
+    # robot2.move_to_inner_ring(0)
+    # print('2', robot2.position_vector)
+    print(robot2.position_vector)
+    # robot3.step_back_from_NAR()
+    print(robot2.position_vector)
+    path = hm.pathfinder(robot2)
+    print(path)
+    command_list = robot3.make_command_list(path)
+
+    print(command_list)
+
+
+
+# move = hm.pathfinder_loop_1(robot2),
+# print(move)
 
 
 if __name__ == '__main__':
