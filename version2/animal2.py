@@ -6,7 +6,7 @@ class Animal:
     def __init__(self, maze, *name):
         # Functions to set up the animal
         self.set_maze(maze)
-        self.set_animal_position()
+        # self.set_animal_position()
         # Identifying the animal
         self.name = name
         self.position_vector = None
@@ -15,7 +15,7 @@ class Animal:
 
     def set_animal_position(self):
         """Get the position of the robot class with the animal in it"""
-        self.position_vector = self.maze.get_animal_robot_position_vector()
+        self.position_vector = self.maze.get_animal_robot_class().position_vector
 
     def set_maze(self, maze):
         """Tell the animal and the maze that they both exist"""

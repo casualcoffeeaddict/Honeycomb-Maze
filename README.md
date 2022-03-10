@@ -12,11 +12,15 @@ Alif Aziz
    1. UI interface required for this?
 5. pick new platform positions
    1. positions will be pick from the list of possible moves from the inner ring
+      1. 
 6. construct path from initial to final positions
    1. Method:
-      1. go from inner ring to outer ring
-      2. move around outer ring - both need to hault on the outer ring until the other robot has made its move
-      3. go back to inner ring
+      1. NNAR go from inner ring to outer ring (i.e. step back from NAR)
+      2. pathfind
+         1. get pathfinding start (the current position of the NNAR)
+         2. get pathfinding target (the outer ring position of the actual target position)
+         3. fun pathfinding command
+      3. go back to inner ring (step in to AR)
 7. check compatibility of all possible pairs of paths
    1. Think about how the paths will be encoded in the program
       1. how will the path to ssh work?

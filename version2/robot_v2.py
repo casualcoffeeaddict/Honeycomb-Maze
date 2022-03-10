@@ -21,6 +21,7 @@ class PlatformRobot:
         self.is_animal_robot = None
         # Target positions on the network
         self.target_position = None
+        self.pathfinding_target_position = None
         # Path robot takes
         self.move_list = None
         self.command_list = None
@@ -103,8 +104,14 @@ class PlatformRobot:
         return movement_choices
 
     def get_target_position(self):
-        animal_robot_position_vector = self.maze.get_animal_robot_position_vector()
-        choices = self.maze.get_inner_ring_coordinates(animal_robot_position_vector)
+        """
+        Get a target position vector which is valid in the following ways:
+        1. It must not be the current position of a robot
+        2. It must be in the outer ring and a valid relative position
+        """
+        animal_robot = self.maze.get_animal_robot_class()
+        choices = self.maze.get_inner_ring_coordinates(animal_robot.position_vector)
+        # 1. It must not be the current position of a robot
         # remove positions of the animal coordinates
         for robot in self.maze.robot_list:
             if robot.position_vector in choices:
@@ -112,10 +119,29 @@ class PlatformRobot:
             else:
                 print('INFO: Robot position vector not inside choice of target positions')
         print(choices)
+
+        # 2. It must be in the outer ring and a valid relative position
+
         return tuple(choice(choices))
+
+    def set_pathfinding_target_position(self, ):
+        """Based on the target position, the pathfinding target position also has to be set """
+        target_position = self.get_target_position() # get target position
+        target_rel_position = self.animal_relative_position(target_position) # get relative position of target
+
+        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        move = rel_inner_ring[target_rel_position]
+        # get position of target based on relative position
+        pathfinding_target_position = [a_i + n_i for a_i, n_i in zip(target_position, move)]
+
+        # set give the robot the target and the pathfinding target position
+        self.target_position = target_position
+        self.pathfinding_target_position = tuple(pathfinding_target_position)
+        return target_position, target_rel_position
 
     def set_target_position(self):
         self.target_position = self.get_target_position()
+        # self.set_pathfinding_target_position()
 
     def animal_relative_position(self, position_vector):
         """
@@ -130,11 +156,12 @@ class PlatformRobot:
             # if the animal robot wants to find the position vector relative to itself
             print('ERROR: relative_position of the animal robot can not be found w.r.t itself')
         # subtract the two position vectors to return relative position vector
-        print('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector', position_vector)
+        print('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector',
+              position_vector)
         x, y, z = [a_i - n_i for a_i, n_i in zip(animal_robot.position_vector, position_vector)]
         print('Debugging: Relative Position Vector', x, y, z)
         if x == 0 and y == 0 and z == 0:
-            print(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined' )
+            print(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined')
         elif y == 0 and x > 0:
             return 0
         elif z == 0 and x > 0:
@@ -180,6 +207,24 @@ class PlatformRobot:
         """Get the direction of the robot (from 0 to 5)"""
         pass
 
+    def get_consecutive_position(self):
+        """Get the positions that are in the inner ring of the robot's current position"""
+        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        inner_ring = []
+        for coord in rel_inner_ring:
+            consecutive_position = [a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
+            inner_ring.append(consecutive_position)
+        return inner_ring
+
+    def get_outer_ring_position(self):
+        """Get the positions that are in the inner ring of the robot's current position"""
+        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        outer_ring = []
+        for coord in rel_inner_ring:
+            consecutive_position = [2 * a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
+            outer_ring.append(consecutive_position)
+        return outer_ring
+
     def move_to_outer_ring(self, direction):
         """Move to outer ring"""
         outer_ring_move = [
@@ -190,7 +235,7 @@ class PlatformRobot:
     def move_to_inner_ring(self, direction):
         """Move to inner ring"""
         print('Debugging', self.ring_dim[direction],
-                                 self.inner_ring_steps[direction])
+              self.inner_ring_steps[direction])
 
         inner_ring_move = [
             self.change_position(self.ring_dim[direction],
@@ -284,16 +329,16 @@ class PlatformRobot:
 
         """
         command_list = []
-        for move in path_list:
+        for move in path_list[1:]:
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
-                print('0 added')
+                print('INFO: 0 added')
                 command_list.append(0)
             elif self.direction != self.path_relative_position(move, self.position_vector):
                 turns = self.turn_robot(move)
                 # make turns more efficient - quick fix
-                print('turns added')
+                print(f'INFO: {turns} turns added')
                 command_list.append(turns)
                 # update the direction of the robot (ie add the number of turns it makes to the direction
                 # then remainder 6)
@@ -306,7 +351,7 @@ class PlatformRobot:
                 pass
             elif self.position_vector != list(move):
                 # step forward 1
-                print('1 added')
+                print('INFO: 1 added')
                 command_list.append(1)
                 # update position
                 self.position_vector = list(move)

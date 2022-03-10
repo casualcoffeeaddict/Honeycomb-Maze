@@ -32,6 +32,21 @@ class HexagonMaze(HexagonGrid):
         # Creates hexgrid network
         self.set_hexgrid_network()
 
+    def see_status(self):
+        """Return the status of the maze (the position of the animal, robots, maze and goal for debugging"""
+        print('\n \n========STATUS OF THE MAZE========')
+        print(f'Maze goal is: {self.goal}')
+
+        print('Position of Robots:')
+        for robot in self.robot_list:
+            print(f'{robot.name} is in position {robot.position_vector} and its the {robot.is_animal_robot}')
+
+        print('Position of Animals:')
+        for animal in self.animal_list:
+            print(f'{animal.name} is in position {animal.position_vector}')
+
+        print('=======END OF STATUS UPDATE======= \n \n ')
+
     def set_goal(self, goal):
         self.goal = goal
 
@@ -60,7 +75,7 @@ class HexagonMaze(HexagonGrid):
     def get_inner_ring_coordinates(self, position_vector):
         inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
         consecutive_coordinate_list = []
-        print('position vector', position_vector)
+        print(f' position vector', position_vector)
         x, y, z = list(position_vector)
         for i in range(len(inner_ring)):
             change_x = inner_ring[i][0]
@@ -163,50 +178,29 @@ class HexagonMaze(HexagonGrid):
             if robot.is_animal_robot == 'NNAR':
                 return robot
 
-    def get_animal_robot_position_vector(self):
-        for robot in self.robot_list:
-            if robot.is_animal_robot == True:
-                return robot.position_vector
-            # else:
-            #     print('ERROR: There is no animal robot in the maze')
-
     def pathfinder(self, non_animal_robot):
-        """Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
-        algorithm """
+        """
+        Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
+        algorithm
+
+        Parameters
+        ----------
+        non_animal_robot = the robot that is just about to move
+        """
         print(non_animal_robot.name)
-        def get_pathfinding_start(non_animal_robot):
-            """From the position of the animal robot, find the starting position for pathfinding"""
-            return non_animal_robot.position_vector
-
-        def get_pathfinding_target(non_animal_robot):
-            """From the actual target, find the position of the pathfinding target"""
-            print('Target Position:', non_animal_robot.target_position)
-
-            target_rel_position = non_animal_robot.animal_relative_position(non_animal_robot.target_position)
-            print('Target relative position:', target_rel_position)
-
-            inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
-            movement = inner_ring[target_rel_position]
-
-            # Element wise addition of the movement and the target position
-            target = [non_animal_robot.target_position + movement for non_animal_robot.target_position, movement
-                      in zip(non_animal_robot.target_position, movement)]
-
-            return target
 
         def flatten(t):
             return (item for sublist in t for item in sublist)
 
-        start = get_pathfinding_start(non_animal_robot)
-        target = get_pathfinding_target(non_animal_robot)
-
+        start = non_animal_robot.position_vector
+        target = non_animal_robot.pathfinding_target_position
 
         self.remove_consecutive_positions()
         network = list(self.temp_movement_network.nodes)
 
         # print('Nodes in network', network)
 
-        print('\nsource:', tuple(start), '\ntarget:', tuple(target))
+        print('\nPathfinding Source:', tuple(start), '\nPathfinding Target:', tuple(target))
 
         return nx.shortest_path(self.temp_movement_network, source=tuple(start), target=tuple(target))
 
