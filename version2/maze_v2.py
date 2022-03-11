@@ -56,17 +56,99 @@ class HexagonMaze(HexagonGrid):
     def add_animal(self, animal):
         self.animal_list.append(animal)
 
-    def generate_hexgrid_network(self):
-        """Makes a grid of appropriate size with all the points in it"""
-        self.movement_network = nx.triangular_lattice_graph(self.rows, self.columns, False, True)
+    def generate_network(self):
+        """Makes the correctly labeled grid.
+        :returns hexagonal grid on which the platforms move around
+        """
 
-        # define remapping function
-        def remapping(element):
-            x = element[0]
-            y = element[1]
-            return x, y, -(x + y)
+        def node_generation(row, col):
+            """Function for generating the correct (and correctly labeled nodes)"""
+            node_list = []
+            for x in range(row):
+                for y in range(col):
+                    node_list.append((x, y, -(x + y)))
+            return node_list
 
-        return nx.relabel_nodes(self.movement_network, remapping)
+        def add_nodes(node_list, graph):
+            for node in node_list:
+                graph.add_node(node)
+            # nx.draw_spring(graph, with_labels=True)
+            return graph
+
+        def consecutive_positions(node):
+            # generate consecutive positions
+            inner_ring_vectors = [(1, 0, -1), (1, -1, 0), (0, -1, 1), (-1, 0, 1), (-1, 1, 0),
+                                  (0, 1, -1)]  # consecutive vectors
+            inner_ring_nodes = []
+            for inner_ring_vector in inner_ring_vectors:
+                # add each vector to the node
+                # print(node, inner_ring_vector)
+                consecutive_node = [
+                    a_i + b_i for a_i, b_i in zip(node, inner_ring_vector)]
+                # print(consecutive_node)
+                # add it to the list
+
+                inner_ring_nodes.append(tuple(consecutive_node))
+
+            return inner_ring_nodes
+
+        def find_consecutive_nodes(node, graph):
+            """if consecutive_nodes are in the node list, then add them to list of edges that need to be joined together"""
+            edge_list = []  # list of edges that need to be joined
+
+            inner_ring_nodes = consecutive_positions(node)  # list of positions consecutive to the nodes
+            print(inner_ring_nodes)
+            # if consecutive nodes are in the list of nodes in the graph
+            for inner_ring_node in inner_ring_nodes:
+                if inner_ring_node in graph.nodes:
+                    edge_list.append(inner_ring_node)  #
+                else:
+                    print(f'the node, {inner_ring_node} was not added as it is not in the {graph}')
+
+            return edge_list
+
+        def add_edges(edge_list, graph, node):
+            """Add edges from edge list to the graph"""
+            for edge in edge_list:
+                graph.add_edge(node, edge)
+            # nx.draw_spring(graph, with_labels=True)
+            return graph
+
+        I = nx.Graph()  # make graph
+
+        def make_network(row, col, graph):
+            """Join all the functions together"""
+
+            # create coordinates
+            node_list = node_generation(row, col, )
+
+            # add nodes to list
+            add_nodes(node_list, graph)
+
+            for node in graph.nodes:
+                # for each node
+                edge_list = find_consecutive_nodes(node,
+                                                   graph)  # find the set of nodes that are consecutive and in the graph
+                add_edges(edge_list, graph, node)
+
+            return graph
+
+        return make_network(self.rows, self.columns, I)
+
+    def set_network(self):
+        self.movement_network = self.generate_network()
+
+    # def generate_hexgrid_network(self):
+    #     """Makes a grid of appropriate size with all the points in it"""
+    #     self.movement_network = nx.triangular_lattice_graph(self.rows, self.columns, False, True)
+    #
+    #     # define remapping function
+    #     def remapping(element):
+    #         x = element[0]
+    #         y = element[1]
+    #         return x, y, -(x + y)
+    #
+    #     return nx.relabel_nodes(self.movement_network, remapping)
 
     def set_hexgrid_network(self):
         """Set the movement network hexagonal grid"""

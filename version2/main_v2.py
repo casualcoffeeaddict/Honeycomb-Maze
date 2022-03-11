@@ -64,8 +64,6 @@ def main():
     # set the animal position one the animal robot is defined
     mouse.set_animal_position()
 
-    hm.see_status()
-
     # method for setting the target and pathfinding target
     robot2.set_pathfinding_target_position()
     print('ROBOT2:', robot2.target_position, robot2.pathfinding_target_position)
