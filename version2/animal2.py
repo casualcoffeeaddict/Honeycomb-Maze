@@ -1,6 +1,6 @@
 """Animal Class"""
 from random import choice
-
+from logging import *
 
 class Animal:
     def __init__(self, maze, *name):
@@ -46,3 +46,4 @@ class Animal:
                 robot.is_animal_robot = 'AR'
             if robot.is_animal_robot == 'NNAR' and new_animal_class != self:
                 robot.is_animal_robot = 'NNAR'
+

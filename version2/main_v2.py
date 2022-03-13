@@ -2,6 +2,9 @@ from animal2 import *
 from maze_v2 import *
 from robot_v2 import *
 
+# Start Logging
+logging.basicConfig(filename='maze.log', encoding='utf-8')
+
 # INSTANTIATE OBJECTS
 # Instantiate maze
 hm = HexagonMaze(column_number=15, row_number=15)

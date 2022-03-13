@@ -1,5 +1,5 @@
 """Robot Class"""
-
+import logging
 from random import choice
 
 
@@ -91,6 +91,7 @@ class PlatformRobot:
             return self.position_vector
         else:
             print('ERROR: Select correct dimension, either x, y, z')
+            logging.error('Select correct dimension, either x, y, z')
 
     def move_no_rotation(self):
         direction_to_axis = {0: 'x', 1: 'y', 2: 'z', 3: 'x', 4: 'y', 5: 'z'}
@@ -118,8 +119,9 @@ class PlatformRobot:
                 choices.remove(robot.position_vector)
             else:
                 print('INFO: Robot position vector not inside choice of target positions')
+                logging.info('INFO: Robot position vector not inside choice of target positions')
         print(choices)
-
+        logging.info(choices)
         # 2. It must be in the outer ring and a valid relative position
 
         return tuple(choice(choices))
@@ -155,13 +157,18 @@ class PlatformRobot:
         if animal_robot.position_vector == position_vector:
             # if the animal robot wants to find the position vector relative to itself
             print('ERROR: relative_position of the animal robot can not be found w.r.t itself')
+            logging.error('ERROR: relative_position of the animal robot can not be found w.r.t itself')
         # subtract the two position vectors to return relative position vector
         print('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector',
               position_vector)
+        logging.debug('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector',
+              position_vector)
         x, y, z = [a_i - n_i for a_i, n_i in zip(animal_robot.position_vector, position_vector)]
         print('Debugging: Relative Position Vector', x, y, z)
+        logging.debug('Debugging: Relative Position Vector', x, y, z)
         if x == 0 and y == 0 and z == 0:
             print(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined')
+            logging.error(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined')
         elif y == 0 and x > 0:
             return 0
         elif z == 0 and x > 0:
@@ -177,6 +184,8 @@ class PlatformRobot:
         else:
             print(f'The robot {self.name} is off axis (its position is invalid because it is off axis),'
                   f' or robot is at origin.')
+            logging.info(f'The robot {self.name} is off axis (its position is invalid because it is off axis),'
+                  f' or robot is at origin.')
 
     def non_animal_relative_position(self, position_vector):
         """Get the relative position between two robots"""
@@ -185,8 +194,10 @@ class PlatformRobot:
         # print(animal_robot.position_vector, non_animal_robot.position_vector)
         x, y, z = [a_i - n_i for a_i, n_i in zip(non_animal_robot.position_vector, position_vector)]
         print('NAR Relative position vector', x, y, z)
+        logging.info('NAR Relative position vector', x, y, z)
         if x == 0 and y == 0 and z == 0:
             print(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined')
+            logging.error(f'ERROR: The robot {self.name} is itself the animal robot so relative position is undefined')
         elif y == 0 and x > 0:
             return 0
         elif z == 0 and x > 0:
@@ -201,6 +212,8 @@ class PlatformRobot:
             return 5
         else:
             print(f'The robot {non_animal_robot.name} is off axis (its position is invalid because it is off axis),'
+                  f' or robot is at origin.')
+            logging.error(f'The robot {non_animal_robot.name} is off axis (its position is invalid because it is off axis),'
                   f' or robot is at origin.')
 
     def update_relative_direction(self):
@@ -234,9 +247,10 @@ class PlatformRobot:
 
     def move_to_inner_ring(self, direction):
         """Move to inner ring"""
-        print('Debugging', self.ring_dim[direction],
-              self.inner_ring_steps[direction])
-
+        # print('DEBUGGING', self.ring_dim[direction],
+        #       self.inner_ring_steps[direction])
+        # logging.debug('DEBUGGING', self.ring_dim[direction],
+        #       self.inner_ring_steps[direction])
         inner_ring_move = [
             self.change_position(self.ring_dim[direction],
                                  self.inner_ring_steps[direction])]
@@ -251,6 +265,7 @@ class PlatformRobot:
         print(self.name, 'position vector', self.position_vector)
         rel_pos = self.non_animal_relative_position(self.position_vector)
         print('DEBUGGING: relative position', rel_pos)
+        logging.debug('DEBUGGING: relative position', rel_pos)
         return self.move_to_inner_ring(rel_pos)
 
     def move_to_animal_outer_ring(self):
@@ -275,6 +290,16 @@ class PlatformRobot:
 
         return common_elements(animal_movement_choices, self_movement_choices)
 
+    def move_to_animal_inner_ring(self):
+        """
+        Method for the both robots
+        ---
+        return the value (should only be one) that intersects with possible movements
+        without rotation with the outer ring
+        """
+        animal_robot = self.maze.get_animal_robot_class()
+        
+
     def get_move_list(self):
         """From the maze, get the path, generated from Pathfinder method"""
         if self.maze is not None:
@@ -282,8 +307,10 @@ class PlatformRobot:
                 return self.maze.path
             else:
                 print('ERROR: Maze path does not exist')
+                logging.error('ERROR: Maze path does not exist')
         else:
             print('ERROR: Maze has not been defined')
+            logging.error('ERROR: Maze has not been defined')
 
     def set_move_list(self):
         self.move_list = self.get_move_list()
@@ -334,11 +361,13 @@ class PlatformRobot:
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
                 print('INFO: 0 added')
+                logging.info('INFO: 0 added')
                 command_list.append(0)
             elif self.direction != self.path_relative_position(move, self.position_vector):
                 turns = self.turn_robot(move)
                 # make turns more efficient - quick fix
                 print(f'INFO: {turns} turns added')
+                logging.info(f'INFO: {turns} turns added')
                 command_list.append(turns)
                 # update the direction of the robot (ie add the number of turns it makes to the direction
                 # then remainder 6)
@@ -352,6 +381,7 @@ class PlatformRobot:
             elif self.position_vector != list(move):
                 # step forward 1
                 print('INFO: 1 added')
+                logging.info('INFO: 1 added')
                 command_list.append(1)
                 # update position
                 self.position_vector = list(move)
