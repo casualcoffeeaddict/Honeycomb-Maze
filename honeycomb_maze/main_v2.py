@@ -3,7 +3,7 @@ from maze_v2 import *
 from robot_v2 import *
 
 # Start Logging
-logging.basicConfig(filename='maze.log', encoding='utf-8')
+logging.basicConfig(filename='version2/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
