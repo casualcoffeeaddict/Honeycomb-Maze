@@ -2,7 +2,7 @@
 
 from robot import *
 from maze import *
-from version1.animal import *
+from honeycomb_maze.version1.animal import *
 
 # instantiate maze
 hm = HexagonMaze(11, 10)

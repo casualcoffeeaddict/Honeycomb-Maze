@@ -37,7 +37,6 @@ class HexagonMaze(HexagonGrid):
         """Return the status of the maze (the position of the animal, robots, maze and goal for debugging"""
         print('\n \n========STATUS OF THE MAZE========')
         print(f'Maze goal is: {self.goal}')
-        logging.info()
         print('Position of Robots:')
         for robot in self.robot_list:
             print(f'{robot.name} is in position {robot.position_vector} and its the {robot.is_animal_robot}')
