@@ -51,10 +51,43 @@ def flatten(t):
 
 
 def functional_main():
-    # changes which animal is the correct animal class
-    animal_choice = mouse.make_random_movement_choice()
-    mouse.change_animal_class()
+    hm.see_status()
 
+    while hm.check_animal_at_goal() == False:
+        # changes which animal is the correct animal class
+        animal_choice = mouse.make_random_movement_choice()
+        mouse.change_animal_class(animal_choice)
+
+        # set the animal position
+        mouse.set_animal_position()
+
+        # method for setting the target and pathfinding target
+        nnar = hm.get_non_non_animal_robot_class()
+        nnar.set_pathfinding_target_position()
+
+        # non non animal robot step back from non animal robot (NAR)
+        nnar.step_back_from_NAR()
+
+        # pathfinding method
+        nnar_path = hm.pathfinder(nnar)  # get path
+        command_list = nnar.make_command_list(nnar_path)  # get commands from path
+        nnar.set_command_list(command_list)  # set commands from path
+
+        # tell robot to execute command
+        nar = hm.get_non_animal_robot_class()
+        nar.move_to_animal_outer_ring() # move the animal to the outer ring
+
+        nar_path = hm.pathfinder(nar)
+        nar_command_list = nar.make_command_list(nar_path)
+        nar.set_command_list(nar_command_list)
+
+        # execute command
+
+        # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
+        nar.move_to_inner_ring()
+        nnar.move_to_inner_ring()
+
+        hm.see_status()
     pass
 
 
@@ -110,6 +143,7 @@ def main():
 
     print('POSITION_VECTOR (robot2):', robot2.position_vector)
     print('POSITION_VECTOR (robot3):', robot3.position_vector)
+
 
 # move = hm.pathfinder_loop_1(robot2),
 # print(move)

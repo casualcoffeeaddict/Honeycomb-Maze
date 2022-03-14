@@ -60,6 +60,9 @@ class HexagonMaze(HexagonGrid):
     def generate_network(self):
         """Makes the correctly labeled grid.
         :returns hexagonal grid on which the platforms move around
+
+        parameters:
+        First is X dimension, second is Y dimension, where the X is the 'spikey' top surface and Y is the smooth side
         """
 
         def node_generation(row, col):
@@ -150,22 +153,6 @@ class HexagonMaze(HexagonGrid):
 
     def set_network(self):
         self.movement_network = self.generate_network()
-
-    # def generate_hexgrid_network(self):
-    #     """Makes a grid of appropriate size with all the points in it"""
-    #     self.movement_network = nx.triangular_lattice_graph(self.rows, self.columns, False, True)
-    #
-    #     # define remapping function
-    #     def remapping(element):
-    #         x = element[0]
-    #         y = element[1]
-    #         return x, y, -(x + y)
-    #
-    #     return nx.relabel_nodes(self.movement_network, remapping)
-
-    # def set_hexgrid_network(self):
-    #     """Set the movement network hexagonal grid"""
-    #     self.movement_network = self.generate_hexgrid_network()
 
     def get_inner_ring_coordinates(self, position_vector):
         inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
@@ -276,6 +263,13 @@ class HexagonMaze(HexagonGrid):
         for robot in self.robot_list:
             if robot.is_animal_robot == 'NNAR':
                 return robot
+
+    def check_animal_at_goal(self):
+        """Check if the animal position is at the position of the goal robot"""
+        if self.get_animal_robot_class() == self.goal:
+            return True
+        elif self.get_animal_robot_class() != self.goal:
+            return False
 
     def pathfinder(self, non_animal_robot):
         """
