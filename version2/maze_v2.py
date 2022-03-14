@@ -73,13 +73,7 @@ class HexagonMaze(HexagonGrid):
             node_list = []
             # for every 2 rows in the network until you fun out of rows to iterate through:
             for x1, x2 in pairwise(list(range(row))):  # for every 2 elements in the list
-                print('x1', x1, 'x2', x2)
-
                 for y in list(range(start, col + start, 1)):  # for every y coordinate
-                    print('start:', start)
-                    print('y', y)
-                    print(x1, y, -(x1 + y))
-                    print(x2, y, -(x2 + y))
                     node_list.append((x1, y, -(x1 + y)))
                     node_list.append((x2, y, -(x2 + y)))
                 start = start - 1
