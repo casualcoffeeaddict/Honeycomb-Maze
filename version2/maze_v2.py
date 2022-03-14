@@ -63,11 +63,29 @@ class HexagonMaze(HexagonGrid):
         """
 
         def node_generation(row, col):
-            """Function for generating the correct (and correctly labeled nodes)"""
+
+            def pairwise(iterable):  # function
+                "s -> (s0, s1), (s2, s3), (s4, s5), ..."
+                a = iter(iterable)
+                return zip(a, a)
+
+            start = 0
             node_list = []
-            for x in range(row):
-                for y in range(col):
-                    node_list.append((x, y, -(x + y)))
+            # for every 2 rows in the network until you fun out of rows to iterate through:
+            for x1, x2 in pairwise(list(range(row))):  # for every 2 elements in the list
+                print('x1', x1, 'x2', x2)
+
+                for y in list(range(start, col + start, 1)):  # for every y coordinate
+                    print('start:', start)
+                    print('y', y)
+                    print(x1, y, -(x1 + y))
+                    print(x2, y, -(x2 + y))
+                    node_list.append((x1, y, -(x1 + y)))
+                    node_list.append((x2, y, -(x2 + y)))
+                start = start - 1
+                # y goes up however it starts back 1 every time it reaches the top
+
+                # step back in the coordinate system 2
             return node_list
 
         def add_nodes(node_list, graph):
