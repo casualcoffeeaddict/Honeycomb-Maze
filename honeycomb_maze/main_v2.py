@@ -1,3 +1,4 @@
+# imports
 from animal2 import *
 from maze_v2 import *
 from robot_v2 import *
@@ -46,12 +47,8 @@ def loop(maze):
     pass
 
 
-def flatten(t):
-    return [item for sublist in t for item in sublist]
-
-
 def functional_main():
-    hm.see_status()
+    hm.get_status()
 
     while hm.check_animal_at_goal() == False:
         # changes which animal is the correct animal class
@@ -60,6 +57,8 @@ def functional_main():
 
         # set the animal position
         mouse.set_animal_position()
+
+        hm.get_status()
 
         # method for setting the target and pathfinding target
         nnar = hm.get_non_non_animal_robot_class()
@@ -70,25 +69,43 @@ def functional_main():
 
         # pathfinding method
         nnar_path = hm.pathfinder(nnar)  # get path
-        command_list = nnar.make_command_list(nnar_path)  # get commands from path
-        nnar.set_command_list(command_list)  # set commands from path
+        nnar_command_list = nnar.make_command_list(nnar_path)  # get commands from path
+        nnar.set_command_list(nnar_command_list)  # set commands from path
 
         # tell robot to execute command
         nar = hm.get_non_animal_robot_class()
-        nar.move_to_animal_outer_ring() # move the animal to the outer ring
+        nar.move_to_animal_outer_ring()  # move the animal to the outer ring
 
         nar_path = hm.pathfinder(nar)
         nar_command_list = nar.make_command_list(nar_path)
         nar.set_command_list(nar_command_list)
 
-        # execute command
+        # EXECUTE COMMAND
+
+        hm.get_status()
 
         # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
-        nar.move_to_inner_ring()
-        nnar.move_to_inner_ring()
+        nar.move_to_inner_ring_animal()
+        nnar.move_to_inner_ring_animal()
 
-        hm.see_status()
+        # EXECUTE COMMAND
+
+        nnar_command_list = [nnar.position_vector]
+
+        # nar_command_list =
+
+        hm.get_status()
     pass
+
+    print(mouse.animal_path)  # return the path of the animal
+
+
+def test():
+    robot1.is_animal_robot = 'AR'
+    robot2.is_animal_robot = 'NNAR'
+    robot3.is_animal_robot = 'NAR'
+
+    print(mouse.make_random_movement_choice())
 
 
 def main():
@@ -100,6 +117,8 @@ def main():
     # set the animal position one the animal robot is defined
     mouse.set_animal_position()
 
+    hm.get_status()
+
     # method for setting the target and pathfinding target
     robot2.set_pathfinding_target_position()
     print('ROBOT2:', robot2.target_position, robot2.pathfinding_target_position)
@@ -110,12 +129,10 @@ def main():
     print('POSITION_VECTOR (robot2):', robot2.position_vector)
 
     # pathfinding method
-    path = hm.pathfinder(robot2)
-    print(path)
-    # make command list
-    command_list = robot2.make_command_list(path)
-    robot2.set_command_list(command_list)
-    print('Command List', command_list)
+    robot2.set_command_list()
+    print('Path List', robot2.path_list)
+    print('Command List:', robot2.command_list)
+    robot2.excute_command_list()
 
     # method for setting the target and pathfinding target
     robot3.set_pathfinding_target_position()
@@ -127,27 +144,35 @@ def main():
     print('POSITION_VECTOR (robot3):', robot3.position_vector)
 
     # pathfinding method
-    path = hm.pathfinder(robot3)
-    print(path)
-    # make command list
-    command_list = robot3.make_command_list(path)
-    robot3.set_command_list(command_list)
-    print('Command List', command_list)
+    robot3.set_command_list()
+    print('Path List', robot3.path_list)
+    print('Command List:', robot3.command_list)
+    robot3.excute_command_list()
 
     # method for stepping into the inner ring
-    print('POSITION_VECTOR (robot2):', robot2.position_vector)
-    print('POSITION_VECTOR (robot3):', robot3.position_vector)
+    hm.get_status()
 
-    robot2.move_to_inner_ring(robot1)
-    robot3.move_to_inner_ring(robot1)
+    print('move to inner ring')
+    robot2.move_to_inner_ring_animal()
+    print(robot2.command_list, robot2.path_list)
+    # robot3.move_to_inner_ring_animal()
 
-    print('POSITION_VECTOR (robot2):', robot2.position_vector)
-    print('POSITION_VECTOR (robot3):', robot3.position_vector)
+    robot2.excute_command_list()
+    # robot3.excute_command_list()
+
+    # print('POSITION_VECTOR (robot2):', robot2.position_vector)
+    # print('POSITION_VECTOR (robot3):', robot3.position_vector)
+    #
+    # print(robot2.animal_relative_position(robot2.position_vector))
+    # print(robot3.animal_relative_position(robot3.position_vector))
+
+    hm.get_status()
 
 
 # move = hm.pathfinder_loop_1(robot2),
 # print(move)
 
-
 if __name__ == '__main__':
     main()
+    # test()
+    # functional_main()

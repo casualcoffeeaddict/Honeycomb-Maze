@@ -27,19 +27,18 @@ class HexagonMaze(HexagonGrid):
         # networkx grid
         self.movement_network = None
         self.temp_movement_network = None
-        # pathfinder commands
-        self.path = None
-
+        # keeps track of the choices the animal has been given to choose from
+        self.choice_list = []
         # Creates hexgrid network
         self.set_network()
 
-    def see_status(self):
+    def get_status(self):
         """Return the status of the maze (the position of the animal, robots, maze and goal for debugging"""
         print('\n \n========STATUS OF THE MAZE========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
         for robot in self.robot_list:
-            print(f'{robot.name} is in position {robot.position_vector} and its the {robot.is_animal_robot}')
+            print(f'{robot.name} is in position {robot.position_vector}, with direction {robot.direction} and its the {robot.is_animal_robot}')
 
         print('Position of Animals:')
         for animal in self.animal_list:
@@ -281,8 +280,6 @@ class HexagonMaze(HexagonGrid):
         """
         print(non_animal_robot.name)
         logging.debug(non_animal_robot.name)
-        def flatten(t):
-            return (item for sublist in t for item in sublist)
 
         start = non_animal_robot.position_vector
         target = non_animal_robot.pathfinding_target_position

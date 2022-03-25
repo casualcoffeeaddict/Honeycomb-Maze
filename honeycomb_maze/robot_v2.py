@@ -2,8 +2,8 @@
 import logging
 from random import choice
 
+import paramiko
 
-# import paramiko
 
 # from connect import *
 
@@ -23,7 +23,7 @@ class PlatformRobot:
         self.target_position = None
         self.pathfinding_target_position = None
         # Path robot takes
-        self.move_list = None
+        self.path_list = None
         self.command_list = None
         # Maze robot is placed in
         self.maze = None
@@ -64,13 +64,29 @@ class PlatformRobot:
         """get the direction of the robot with respect to the grid (i.e. relative to the North)"""
         pass
 
+    def get_change_position(self, axis, step):
+        """Move position vector around the board"""
+        x = self.position_vector[0]
+        y = self.position_vector[1]
+        z = self.position_vector[2]
+        if axis == 'x':
+            y += step
+            z -= step
+            return self.position_vector
+        elif axis == 'y':
+            x += step
+            z -= step
+            return self.position_vector
+        elif axis == 'z':
+            x += step
+            y -= step
+            return self.position_vector
+        else:
+            print('ERROR: Select correct dimension, either x, y, z')
+            logging.error('Select correct dimension, either x, y, z')
+
     def change_position(self, axis, step):
         """Move position vector around the board"""
-        # rotation_check = self.dimension_dict[dimension]
-        # print('change position, self.position_vector', self.position_vector)
-        # if self.direction != dimension:
-        #     change = self.dimension_dict[dimension] - self.direction
-        #     self.change_rotation(change)
         x = self.position_vector[0]
         y = self.position_vector[1]
         z = self.position_vector[2]
@@ -128,8 +144,8 @@ class PlatformRobot:
 
     def set_pathfinding_target_position(self, ):
         """Based on the target position, the pathfinding target position also has to be set """
-        target_position = self.get_target_position() # get target position
-        target_rel_position = self.animal_relative_position(target_position) # get relative position of target
+        target_position = self.get_target_position()  # get target position
+        target_rel_position = self.animal_relative_position(target_position)  # get relative position of target
 
         rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
         move = rel_inner_ring[target_rel_position]
@@ -162,7 +178,7 @@ class PlatformRobot:
         print('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector',
               position_vector)
         logging.debug('DEBUGGING: animal robot position vector:', animal_robot.position_vector, 'position vector',
-              position_vector)
+                      position_vector)
         x, y, z = [a_i - n_i for a_i, n_i in zip(animal_robot.position_vector, position_vector)]
         print('Debugging: Relative Position Vector', x, y, z)
         logging.debug('Debugging: Relative Position Vector', x, y, z)
@@ -185,7 +201,7 @@ class PlatformRobot:
             print(f'The robot {self.name} is off axis (its position is invalid because it is off axis),'
                   f' or robot is at origin.')
             logging.info(f'The robot {self.name} is off axis (its position is invalid because it is off axis),'
-                  f' or robot is at origin.')
+                         f' or robot is at origin.')
 
     def non_animal_relative_position(self, position_vector):
         """Get the relative position between two robots"""
@@ -213,8 +229,9 @@ class PlatformRobot:
         else:
             print(f'The robot {non_animal_robot.name} is off axis (its position is invalid because it is off axis),'
                   f' or robot is at origin.')
-            logging.error(f'The robot {non_animal_robot.name} is off axis (its position is invalid because it is off axis),'
-                  f' or robot is at origin.')
+            logging.error(
+                f'The robot {non_animal_robot.name} is off axis (its position is invalid because it is off axis),'
+                f' or robot is at origin.')
 
     def update_relative_direction(self):
         """Get the direction of the robot (from 0 to 5)"""
@@ -253,7 +270,7 @@ class PlatformRobot:
         #       self.inner_ring_steps[direction])
         inner_ring_move = [
             self.change_position(self.ring_dim[direction],
-                                 self.inner_ring_steps[direction])]
+                                 self.outer_ring_steps[direction])]
         return inner_ring_move
 
     def step_back_from_NAR(self):
@@ -292,15 +309,33 @@ class PlatformRobot:
 
         return common_elements(animal_movement_choices, self_movement_choices)
 
-    def move_to_animal_inner_ring(self):
+
+    def get_move_to_inner_ring(self, direction):
+        self.get_change_position(self.ring_dim[direction],
+                                 self.outer_ring_steps[direction])
+
+    def move_to_inner_ring_animal(self):
         """
         Method for the both robots
         ---
         return the value (should only be one) that intersects with possible movements
         without rotation with the outer ring
         """
-        animal_robot = self.maze.get_animal_robot_class()
-        
+
+
+        self.path_list = [self.position_vector]
+
+        rel_pos = self.animal_relative_position(self.position_vector)  # get relative position of animal robot
+        move = self.move_to_inner_ring( rel_pos)
+
+        print(move)
+
+        def flatten(t):
+            return [item for sublist in t for item in sublist]
+
+        self.path_list.append(list(flatten(move)))
+        print(self.path_list)
+        self.command_list = self.make_command_list(self.path_list)
 
     def get_move_list(self):
         """From the maze, get the path, generated from Pathfinder method"""
@@ -320,8 +355,7 @@ class PlatformRobot:
     def turn_robot(self, move):
         """Method for make_command_list: returns the number of turns required to get to the next move"""
         # from self.direction, return the number of turns required to get the correct direction
-        direction_difference = self.path_relative_position(move, self.position_vector) \
-                               - self.direction
+        direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
         turns = direction_difference % 6
         return turns
 
@@ -390,20 +424,28 @@ class PlatformRobot:
 
         return command_list
 
-    def set_command_list(self, command_list):
+    def set_command_list(self):
+        # get path from pathfinder function
+        self.path_list = self.maze.pathfinder(self)
+        # make command list from path list
+        command_list = self.make_command_list(self.path_list)
+        # set the path list
         self.command_list = command_list
 
-    def send_command_list(self, command_list):
+    def excute_command_list(self):
         """
         Before this command is run, the command list must be initialised
 
         WILL MOVE ROBOTS!
         Send the commands to the robot to move
         """
-        self.set_command_list()
-        if self.command_list != None:
-            command_string = ' '.join(command_list)
+        if self.command_list == None:
+            print('The command list is empty')
+        elif self.command_list != None:
+            # make list into string of numbers
+            command_string = ' '.join(map(str, self.command_list))
             # send command
-            stdin, stdout, sterr = self.name.exec_command(f'./lineFollowJunction4 {command_string}')
-
-        pass
+            # stdin, stdout, sterr = self.name.exec_command(f'./lineFollowJunction4 {command_string}')
+            print(f'./lineFollowJunction4 {command_string}')
+            # to prevent commands being executed twice, clear the command list
+            self.command_list = None
