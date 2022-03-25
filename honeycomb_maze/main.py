@@ -1,7 +1,7 @@
 # imports
-from animal2 import *
-from maze_v2 import *
-from robot_v2 import *
+from animal import *
+from maze import *
+from robot import *
 
 # Start Logging
 logging.basicConfig(filename='version2/maze.log', encoding='utf-8')
