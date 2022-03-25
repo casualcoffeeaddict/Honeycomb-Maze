@@ -266,6 +266,8 @@ class PlatformRobot:
         rel_pos = self.non_animal_relative_position(self.position_vector)
         print('DEBUGGING: relative position', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
+        # add
+
         return self.move_to_inner_ring(rel_pos)
 
     def move_to_animal_outer_ring(self):

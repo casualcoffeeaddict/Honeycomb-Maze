@@ -58,7 +58,7 @@ class HexagonMaze(HexagonGrid):
 
     def generate_network(self):
         """Makes the correctly labeled grid.
-        :returns hexagonal grid on which the platforms move around
+        :returns hexagonal grid on which the platforms move around. From the size of the actual space 2
 
         parameters:
         First is X dimension, second is Y dimension, where the X is the 'spikey' top surface and Y is the smooth side
