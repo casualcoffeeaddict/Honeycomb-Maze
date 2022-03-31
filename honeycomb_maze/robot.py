@@ -72,15 +72,15 @@ class PlatformRobot:
         if axis == 'x':
             y += step
             z -= step
-            return self.position_vector
+            return [x, y, z]
         elif axis == 'y':
             x += step
             z -= step
-            return self.position_vector
+            return [x, y, z]
         elif axis == 'z':
             x += step
             y -= step
-            return self.position_vector
+            return [x, y, z]
         else:
             print('ERROR: Select correct dimension, either x, y, z')
             logging.error('Select correct dimension, either x, y, z')
@@ -309,10 +309,12 @@ class PlatformRobot:
 
         return common_elements(animal_movement_choices, self_movement_choices)
 
-
     def get_move_to_inner_ring(self, direction):
-        self.get_change_position(self.ring_dim[direction],
-                                 self.outer_ring_steps[direction])
+
+        inner_ring_move = self.get_change_position(self.ring_dim[direction],
+                                                    self.outer_ring_steps[direction])
+
+        return inner_ring_move
 
     def move_to_inner_ring_animal(self):
         """
@@ -321,19 +323,18 @@ class PlatformRobot:
         return the value (should only be one) that intersects with possible movements
         without rotation with the outer ring
         """
-
-
         self.path_list = [self.position_vector]
 
         rel_pos = self.animal_relative_position(self.position_vector)  # get relative position of animal robot
-        move = self.move_to_inner_ring( rel_pos)
-
-        print(move)
+        move = self.get_move_to_inner_ring(rel_pos)
+        print('rel_pos', rel_pos)
+        print('move', move)
+        print(self.position_vector)
 
         def flatten(t):
             return [item for sublist in t for item in sublist]
 
-        self.path_list.append(list(flatten(move)))
+        self.path_list.append(list(move))
         print(self.path_list)
         self.command_list = self.make_command_list(self.path_list)
 

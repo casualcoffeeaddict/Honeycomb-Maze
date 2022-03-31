@@ -1,11 +1,26 @@
-from setuptools import setup
+import setuptools
 
-setup(name='honeycomb_maze',
-      version='0.1',
+setuptools.setup(
+      # package metadata
+      name='honeycomb_maze',
+      version='0.1.0',
       description='Python Implementation of Honeycomb Maze',
+      long_description='To be filled in',
+      long_description_content_type="text/markdown",
+
+      #
+      license='MIT',
+      packages=setuptools.find_packages(),
+      zip_safe=False,
+
+      # source metadata:
       url='https://github.com/casualcoffeeaddict/Honeycomb-Maze',
       author='Alif Ul Aziz',
       author_email='alif.aziz@icloud.com',
-      license='MIT',
-      packages=['honeycomb_maze'],
-      zip_safe=False)
+
+      # declare dependencies here:
+      # find dependencies on PyPI - default install location: https://pypi.org
+      install_requires=[
+      'markdown', 'networkx', 'random', 'logging', 'paramiko'
+      ],
+)

@@ -1,6 +1,5 @@
 """Animal Class"""
 from random import choice
-from logging import *
 
 class Animal:
     def __init__(self, maze, *name):
@@ -17,6 +16,7 @@ class Animal:
 
     def set_animal_position(self):
         """Get the position of the robot class with the animal in it"""
+        print('animal position vector', self.maze.get_animal_robot_class().position_vector)
         self.position_vector = self.maze.get_animal_robot_class().position_vector
 
     def set_maze(self, maze):
@@ -34,14 +34,13 @@ class Animal:
 
         robot_list.remove(animal_robot_class) # remove the class of the robot on which the animal is on
 
-        animal_choice = choice(robot_list).position_vector
+        animal_choice = choice(robot_list)
 
-        self.animal_path.append(animal_choice) # append choice animal makes to list to keep track
-        return choice # return position vector of the robot chosen
+        self.animal_path.append(animal_choice.position_vector) # append choice animal makes to list to keep track
+        return animal_choice # return position vector of the robot chosen
 
     def change_animal_class(self, new_animal_class):
         """Based on choice (random by default) , change the class of the animal robot and non animal robot"""
-        new_animal_class.is_animal_robot
 
         for robot in self.maze.robot_list:
             if robot.is_animal_robot == 'AR' and new_animal_class == self:
