@@ -249,7 +249,7 @@ class HexagonMaze(HexagonGrid):
             if robot.is_animal_robot == 'AR':
                 return robot
             else:
-                print('ERROR: there is no animal robot in the maze')
+                print('ERROR: There is no animal robot in the maze')
                 logging.error('ERROR: there is no animal robot in the maze')
 
 

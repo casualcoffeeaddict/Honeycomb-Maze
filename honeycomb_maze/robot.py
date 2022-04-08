@@ -117,7 +117,7 @@ class PlatformRobot:
         movement_choices = []
         step_list = [1, -2]
         for step in step_list:
-            movement_choices.append(self.change_position(axis, step))
+            movement_choices.append(self.get_change_position(axis, step))
         return movement_choices
 
     def get_target_position(self):
@@ -294,11 +294,13 @@ class PlatformRobot:
         return the value (should only be one) that intersects with possible movements
         without rotation with the outer ring
         """
-        animal_robot_class = self.maze.get_animal_robot_class()
         # list of coordinates
-        animal_movement_choices = self.maze.get_inner_ring_coordinates(animal_robot_class.position_vector)
+        animal_robot_class = self.maze.get_animal_robot_class()
+        animal_movement_choices = self.maze.get_outer_ring_coordinates(animal_robot_class.position_vector)
         # return intersection of lists
         self_movement_choices = self.move_no_rotation()
+        print('animal_movement_choices', animal_movement_choices)
+        print('self_movement_choices', self_movement_choices)
 
         def common_elements(list1, list2):
             result = []
@@ -307,7 +309,11 @@ class PlatformRobot:
                     result.append(element)
             return result
 
-        return common_elements(animal_movement_choices, self_movement_choices)
+        # get common element
+        common_element = common_elements(animal_movement_choices, self_movement_choices)
+        # assign new position vector
+        self.position_vector = common_element[0]
+        return self.position_vector
 
     def get_move_to_inner_ring(self, direction):
 
@@ -433,7 +439,7 @@ class PlatformRobot:
         # set the path list
         self.command_list = command_list
 
-    def excute_command_list(self):
+    def execute_command_list(self):
         """
         Before this command is run, the command list must be initialised
 

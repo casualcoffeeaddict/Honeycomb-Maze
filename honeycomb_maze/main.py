@@ -48,7 +48,7 @@ def functional_main():
     # changes which animal is the correct animal class
     animal_choice_class = mouse.make_random_movement_choice()
     print('animalchoice', animal_choice_class.name)
-    print(hm.get_non_animal_robot_class() == animal_choice_class)
+    # print(hm.get_animal_robot_class() == animal_choice_class)
     mouse.change_animal_class(animal_choice_class)
 
     hm.get_status()
@@ -60,8 +60,8 @@ def functional_main():
 
     # method for setting the target and pathfinding target
     nnar = hm.get_non_non_animal_robot_class()
-    nnar.set_pathfinding_target_position()
-
+    print(nnar.name)
+    nnar.set_pathfinding_target_position() # pathfinding position must not be the pathfinding position of the other robot.
     # non non animal robot step back from non animal robot (NAR)
     nnar.step_back_from_NAR()
 
@@ -70,30 +70,39 @@ def functional_main():
     # tell robot to execute command
     nnar.execute_command_list()
 
+    hm.get_status()
+
     nar = hm.get_non_animal_robot_class()
-    nar.move_to_animal_outer_ring()  # move the animal to the outer ring
+    print('start', nar.position_vector)
+    nar.set_pathfinding_target_position() # does this work for NAR?
+    # print(hm.get_animal_robot_class())
+    print(nar.move_to_animal_outer_ring())  # move the animal to the outer ring
+    print('end', nar.position_vector)
 
-    nnar.set_command_list()
+    print(nar.pathfinding_target_position)
 
-    # EXECUTE COMMAND
-    nnar.execute_command_list()
-
+    nar.set_command_list()
+    print(nar.command_list)
+    # # EXECUTE COMMAND
+    nar.execute_command_list()
+    #
     hm.get_status()
 
     # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
     nar.move_to_inner_ring_animal()
     nnar.move_to_inner_ring_animal()
-
+    nar.execute_command_list()
+    nnar.execute_command_list()
     # EXECUTE COMMAND
 
-    nnar_command_list = [nnar.position_vector]
+    hm.get_status()
 
     # nar_command_list =
 
-    hm.get_status()
+    # hm.get_status()
     pass
 
-    print(mouse.animal_path)  # return the path of the animal
+    # print(mouse.animal_path)  # return the path of the animal
 
 
 def main():
@@ -163,11 +172,13 @@ def main():
 if __name__ == '__main__':
     # main()
     # test()
-    robot1.is_animal_robot = 'AR'
-    robot2.is_animal_robot = 'NNAR'
-    robot3.is_animal_robot = 'NAR'
+
+    # robot1.is_animal_robot = 'AR'
+    # robot2.is_animal_robot = 'NNAR'
+    # robot3.is_animal_robot = 'NAR'
 
     # print(hm.get_animal_robot_class().position_vector)
 
-    # functional_main()
-    init(robot1, robot3, robot2)
+    functional_main()
+    # init(robot1, robot3, robot2)
+    pass
