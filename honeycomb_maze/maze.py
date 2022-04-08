@@ -9,7 +9,7 @@ class HexagonGrid:
     def __init__(self, column_number, row_number, *name):
         self.columns = column_number
         self.rows = row_number
-
+        # name of the maze
         self.name = name
 
 

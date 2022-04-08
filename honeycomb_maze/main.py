@@ -47,7 +47,7 @@ def functional_main():
     # while hm.check_animal_at_goal() == False:
     # changes which animal is the correct animal class
     animal_choice_class = mouse.make_random_movement_choice()
-    print('animalchoice', animal_choice_class.name)
+    print('animal choice', animal_choice_class.name)
     # print(hm.get_animal_robot_class() == animal_choice_class)
     mouse.change_animal_class(animal_choice_class)
 
@@ -79,11 +79,12 @@ def functional_main():
 
     hm.get_status()
 
-
     print('start', nar.position_vector)
+
     nar.set_pathfinding_target_position() # does this work for NAR?
     # print(hm.get_animal_robot_class())
     print(nar.move_to_animal_outer_ring())  # move the animal to the outer ring
+
     print('end', nar.position_vector)
 
     print(nar.pathfinding_target_position)

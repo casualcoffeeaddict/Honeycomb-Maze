@@ -471,3 +471,6 @@ class PlatformRobot:
             print(f'./lineFollowJunction4 {command_string}')
             # to prevent commands being executed twice, clear the command list
             self.command_list = None
+
+            # reset the target position
+            self.target_position = None

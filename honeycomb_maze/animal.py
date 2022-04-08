@@ -41,8 +41,7 @@ class Animal:
         return animal_choice  # return position vector of the robot chosen
 
     def change_animal_class(self, new_animal_class):
-        """Based on choice (random by default) , change the class of the animal robot and non animal robot"""
-        print(self)
+        """Based on choice (random by default), change the class of the animal robot and non-animal robot"""
 
         # change class for robot list
         for robot in self.maze.robot_list:
