@@ -125,17 +125,28 @@ class PlatformRobot:
         Get a target position vector which is valid in the following ways:
         1. It must not be the current position of a robot
         2. It must be in the outer ring and a valid relative position
+        3. It must not be in the current pathfinding target position of the other non animal robot
         """
         animal_robot = self.maze.get_animal_robot_class()
         choices = self.maze.get_inner_ring_coordinates(animal_robot.position_vector)
         # 1. It must not be the current position of a robot
         # remove positions of the animal coordinates
         for robot in self.maze.robot_list:
+            # remove the position of the robots from the 'choices' list
             if robot.position_vector in choices:
                 choices.remove(robot.position_vector)
             else:
                 print('INFO: Robot position vector not inside choice of target positions')
                 logging.info('INFO: Robot position vector not inside choice of target positions')
+
+            # remove the position of the other robot's target position
+
+            if robot.target_position != None:
+                if list(robot.target_position) in choices:
+                    choices.remove(list(robot.target_position))
+                else:
+                    print(f"INFO: The robot,{robot.name}'s target position was not in the list of choices. It was {robot.target_position}")
+
         print(choices)
         logging.info(choices)
         # 2. It must be in the outer ring and a valid relative position
@@ -143,7 +154,11 @@ class PlatformRobot:
         return tuple(choice(choices))
 
     def set_pathfinding_target_position(self, ):
-        """Based on the target position, the pathfinding target position also has to be set """
+        """Based on the target position, the pathfinding target position also has to be set
+        INFO:
+        self.target_position is the place where the robot wants to go
+        self.pathfinding_target_position is the place where the pathfinding for networkx will aim for
+        """
         target_position = self.get_target_position()  # get target position
         target_rel_position = self.animal_relative_position(target_position)  # get relative position of target
 

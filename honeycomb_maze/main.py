@@ -60,8 +60,15 @@ def functional_main():
 
     # method for setting the target and pathfinding target
     nnar = hm.get_non_non_animal_robot_class()
-    print(nnar.name)
+    nar = hm.get_non_animal_robot_class()
+    # print(nnar.name)
+
+
     nnar.set_pathfinding_target_position() # pathfinding position must not be the pathfinding position of the other robot.
+    print('nnar\n\n', nnar.target_position)
+
+    nar.set_pathfinding_target_position()
+    print('nar\n\n', nar.target_position)
     # non non animal robot step back from non animal robot (NAR)
     nnar.step_back_from_NAR()
 
@@ -72,7 +79,7 @@ def functional_main():
 
     hm.get_status()
 
-    nar = hm.get_non_animal_robot_class()
+
     print('start', nar.position_vector)
     nar.set_pathfinding_target_position() # does this work for NAR?
     # print(hm.get_animal_robot_class())
