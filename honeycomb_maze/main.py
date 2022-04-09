@@ -187,6 +187,7 @@ if __name__ == '__main__':
 
     # print(hm.get_animal_robot_class().position_vector)
 
-    functional_main()
+    # functional_main()
     # init(robot1, robot3, robot2)
+    help(HexagonMaze.get_status().__doc__)
     pass

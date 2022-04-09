@@ -35,7 +35,7 @@ class HexagonMaze(HexagonGrid):
         self.set_network()
 
     def get_status(self):
-        """Return the status of the maze (the position of the animal, robots, maze and goal for debugging"""
+        """Return the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
         print('\n \n========STATUS OF THE MAZE========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
@@ -49,12 +49,15 @@ class HexagonMaze(HexagonGrid):
         print('=======END OF STATUS UPDATE======= \n \n ')
 
     def set_goal(self, goal):
+        """Set the goal for the animal to get to"""
         self.goal = goal
 
     def add_robot(self, robot):
+        """Adds animals to the maze's list of robots, self.robot_list"""
         self.robot_list.append(robot)
 
     def add_animal(self, animal):
+        """Adds animals to the maze's list of animals, self.animal_list"""
         self.animal_list.append(animal)
 
     def generate_network(self):
@@ -136,7 +139,7 @@ class HexagonMaze(HexagonGrid):
             """Join all the functions together"""
 
             # create coordinates
-            node_list = node_generation(row, col, )
+            node_list = node_generation(row, col)
 
             # add nodes to list
             add_nodes(node_list, graph)
@@ -152,9 +155,11 @@ class HexagonMaze(HexagonGrid):
         return make_network(self.rows, self.columns, I)
 
     def set_network(self):
+        """Sets the network of points (in networkx) for which the robots can move around in"""
         self.movement_network = self.generate_network()
 
     def get_inner_ring_coordinates(self, position_vector):
+        """Returns a list of all the consecutive positions around a particular position vector"""
         inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
         consecutive_coordinate_list = []
         print(f' position vector', position_vector)
@@ -170,6 +175,10 @@ class HexagonMaze(HexagonGrid):
         return consecutive_coordinate_list
 
     def get_outer_ring_coordinates(self, position_vector):
+        """
+        Returns a list of all the positions that are in the outer ring (ring of radius 2)
+        around a particular coordinate
+        """
         inner_ring = [[2, 0, -2], [2, -1, -1], [2, -2, 0], [1, -2, 1], [0, -2, 2], [-1, -1, 2], [-2, 0, 2], [-2, 1, 1],
                       [-2, 2, 0], [-1, 2, -1], [0, 2, -2]]
         outer_ring_coordinates = []
@@ -184,10 +193,12 @@ class HexagonMaze(HexagonGrid):
         return outer_ring_coordinates
 
     def get_consecutive_positions(self, moving_robot_class):
-        """From the robot positions, select the positions and consecutive positions of the non-moving robots
+        """
+        From the robot positions, select the positions and consecutive positions of the non-moving robots
         from the network
         and
-        returns a list of tuples that are consecutive to the robots in the network"""
+        returns a list of tuples that are consecutive to the robots in the network
+        """
         # Non-moving robots position list
         robot_position_list = []
         for robot in self.robot_list:
