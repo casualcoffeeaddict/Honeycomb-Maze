@@ -70,7 +70,7 @@ class HexagonMaze(HexagonGrid):
 
         def node_generation(row, col):
 
-            def pairwise(iterable):  # function
+            def pairwise(iterable):  # function to iterate through objects in parirs
                 "s -> (s0, s1), (s2, s3), (s4, s5), ..."
                 a = iter(iterable)
                 return zip(a, a)
@@ -112,7 +112,7 @@ class HexagonMaze(HexagonGrid):
             return inner_ring_nodes
 
         def find_consecutive_nodes(node, graph):
-            """if consecutive_nodes are in the node list, then add them to list of edges that need to be joined together"""
+            # if consecutive_nodes are in the node list, then add them to list of edges that need to be joined together
             edge_list = []  # list of edges that need to be joined
 
             inner_ring_nodes = consecutive_positions(node)  # list of positions consecutive to the nodes
@@ -127,7 +127,7 @@ class HexagonMaze(HexagonGrid):
             return edge_list
 
         def add_edges(edge_list, graph, node):
-            """Add edges from edge list to the graph"""
+            # Add edges from edge list to the graph
             for edge in edge_list:
                 graph.add_edge(node, edge)
             # nx.draw_spring(graph, with_labels=True)
@@ -136,7 +136,7 @@ class HexagonMaze(HexagonGrid):
         I = nx.Graph()  # make graph
 
         def make_network(row, col, graph):
-            """Join all the functions together"""
+            # Join all the functions together
 
             # create coordinates
             node_list = node_generation(row, col)
@@ -155,11 +155,15 @@ class HexagonMaze(HexagonGrid):
         return make_network(self.rows, self.columns, I)
 
     def set_network(self):
-        """Sets the network of points (in networkx) for which the robots can move around in"""
+        """
+        Sets the network of points (in networkx) for which the robots can move around in
+        """
         self.movement_network = self.generate_network()
 
     def get_inner_ring_coordinates(self, position_vector):
-        """Returns a list of all the consecutive positions around a particular position vector"""
+        """
+        Returns a list of all the consecutive positions around a particular position vector
+        """
         inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
         consecutive_coordinate_list = []
         print(f' position vector', position_vector)
@@ -179,14 +183,18 @@ class HexagonMaze(HexagonGrid):
         Returns a list of all the positions that are in the outer ring (ring of radius 2)
         around a particular coordinate
         """
-        inner_ring = [[2, 0, -2], [2, -1, -1], [2, -2, 0], [1, -2, 1], [0, -2, 2], [-1, -1, 2], [-2, 0, 2], [-2, 1, 1],
-                      [-2, 2, 0], [-1, 2, -1], [0, 2, -2]]
+        outer_ring = [[2, 0, -2], [2, -1, -1],
+                      [2, -2, 0], [1, -2, 1],
+                      [0, -2, 2], [-1, -1, 2],
+                      [-2, 0, 2], [-2, 1, 1],
+                      [-2, 2, 0], [-1, 2, -1],
+                      [0, 2, -2], [1, 1, -2]]
         outer_ring_coordinates = []
         x, y, z = position_vector
-        for i in range(len(inner_ring)):
-            change_x = inner_ring[i][0]
-            change_y = inner_ring[i][1]
-            change_z = inner_ring[i][2]
+        for i in range(len(outer_ring)):
+            change_x = outer_ring[i][0]
+            change_y = outer_ring[i][1]
+            change_z = outer_ring[i][2]
 
             outer_ring_coordinates.append([x + change_x, y + change_y, z + change_z])
 
@@ -237,7 +245,7 @@ class HexagonMaze(HexagonGrid):
 
     def remove_consecutive_positions(self):
         """Remove the positions that are consecutive to the robots and update self.temp_movement_network"""
-        self.temp_movement_network = self.movement_network
+        self.temp_movement_network = self.movement_network.copy()  # create copy of movement network
         for i in range(len(self.consecutive_positions)):
             position = self.consecutive_positions[i]
             if position in list(self.temp_movement_network.nodes):
@@ -298,7 +306,6 @@ class HexagonMaze(HexagonGrid):
         target = non_animal_robot.pathfinding_target_position
 
         self.remove_consecutive_positions()
-        network = list(self.temp_movement_network.nodes)
 
         # print('Nodes in network', network)
         logging.debug('\nPathfinding Source:', tuple(start), '\nPathfinding Target:', tuple(target))
@@ -306,25 +313,25 @@ class HexagonMaze(HexagonGrid):
 
         return nx.shortest_path(self.temp_movement_network, source=tuple(start), target=tuple(target))
 
-    def pathfinder_loop_1(self, moving_robot_class):
-        # step 1 - will be different for NAR and NNAR
-        first_move = []
-        if moving_robot_class.is_animal_robot == 'NNAR':
-            first_move.append(moving_robot_class.step_back_from_NAR())
-        if moving_robot_class.is_animal_robot == 'NAR':
-            first_move.append(moving_robot_class.move_to_animal_outer_ring())
+    # def pathfinder_loop_1(self, moving_robot_class):
+    #     # step 1 - will be different for NAR and NNAR
+    #     first_move = []
+    #     if moving_robot_class.is_animal_robot == 'NNAR':
+    #         first_move.append(moving_robot_class.step_back_from_NAR())
+    #     if moving_robot_class.is_animal_robot == 'NAR':
+    #         first_move.append(moving_robot_class.move_to_animal_outer_ring())
+    #
+    #     # generate pathfinding network for a given robot to path find around
+    #     self.make_temp_movement_network(moving_robot_class)
+    #     # path find around this network to final outer ring positions
+    #     path = self.pathfinder(moving_robot_class)
+    #
+    #     return moving_robot_class.make_command_list(path)
 
-        # generate pathfinding network for a given robot to path find around
-        self.make_temp_movement_network(moving_robot_class)
-        # path find around this network to final outer ring positions
-        path = self.pathfinder(moving_robot_class)
-
-        return moving_robot_class.make_command_list(path)
-
-    def pathfinder_loop_2(self, moving_robot_class):
-        """Move both non-animal robots (NAR & NNAR) to the inner ring at the same time"""
-        direction = moving_robot_class.animal_relative_position(moving_robot_class.position_vector)
-        moving_robot_class.move_to_outer_ring(direction)
+    # def pathfinder_loop_2(self, moving_robot_class):
+    #     """Move both non-animal robots (NAR & NNAR) to the inner ring at the same time"""
+    #     direction = moving_robot_class.animal_relative_position(moving_robot_class.position_vector)
+    #     moving_robot_class.move_to_outer_ring(direction)
 
 
 def main():

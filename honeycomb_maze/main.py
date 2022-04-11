@@ -44,34 +44,33 @@ def init(AR, NAR, NNAR):
 def functional_main():
     hm.get_status()
 
-    # while hm.check_animal_at_goal() == False:
     # changes which animal is the correct animal class
-    animal_choice_class = mouse.make_random_movement_choice()
-    print('animal choice', animal_choice_class.name)
+    animal_choice_class = mouse.make_user_choice()  # animal makes choice
+    # print('animal choice', animal_choice_class.name)
     # print(hm.get_animal_robot_class() == animal_choice_class)
-    mouse.change_animal_class(animal_choice_class)
+    mouse.change_animal_class(animal_choice_class)  # animal moves to its choice
 
     hm.get_status()
 
     # set the animal position
-    mouse.set_animal_position()
+    mouse.set_animal_position()  # change the position of the animal based on its movement
 
     hm.get_status()
 
     # method for setting the target and pathfinding target
+    # GET THE CLASSES OF THE NON ANIMAL ROBOTS
     nnar = hm.get_non_non_animal_robot_class()
     nar = hm.get_non_animal_robot_class()
     # print(nnar.name)
-
-
-    nnar.set_pathfinding_target_position() # pathfinding position must not be the pathfinding position of the other robot.
+    # SETTING PATHFINDING TARGETS
+    nnar.set_pathfinding_target_position()  # pathfinding position must not be the pathfinding position of the other robot.
     print('nnar\n\n', nnar.target_position)
 
     nar.set_pathfinding_target_position()
     print('nar\n\n', nar.target_position)
-    # non non animal robot step back from non animal robot (NAR)
-    nnar.step_back_from_NAR()
 
+    # NNAR step back from NAR
+    nnar.step_back_from_NAR()
     # pathfinding method
     nnar.set_command_list()
     # tell robot to execute command
@@ -79,26 +78,23 @@ def functional_main():
 
     hm.get_status()
 
-    print('start', nar.position_vector)
-
-    nar.set_pathfinding_target_position() # does this work for NAR?
+    # NAR moves to outer ring of AR
+    # print('start', nar.position_vector)
     # print(hm.get_animal_robot_class())
     print(nar.move_to_animal_outer_ring())  # move the animal to the outer ring
-
-    print('end', nar.position_vector)
-
-    print(nar.pathfinding_target_position)
-
+    # print('end', nar.position_vector)
+    # print(nar.pathfinding_target_position)
     nar.set_command_list()
-    print(nar.command_list)
-    # # EXECUTE COMMAND
+    # print(nar.command_list)
+    # robot executes command
     nar.execute_command_list()
-    #
+
     hm.get_status()
 
     # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
     nar.move_to_inner_ring_animal()
     nnar.move_to_inner_ring_animal()
+
     nar.execute_command_list()
     nnar.execute_command_list()
     # EXECUTE COMMAND
@@ -174,9 +170,6 @@ def main():
     hm.get_status()
 
 
-# move = hm.pathfinder_loop_1(robot2),
-# print(move)
-
 if __name__ == '__main__':
     # main()
     # test()
@@ -187,7 +180,31 @@ if __name__ == '__main__':
 
     # print(hm.get_animal_robot_class().position_vector)
 
-    # functional_main()
+    # run = 0
+    # while run <= 3:
+    #     print(f"Round {run}")
+    #     functional_main()
+    #
+    #     run = run + 1
+    print('Round 1')
+
+    functional_main()
+
+    print('Round 2')
+
+    functional_main()
+
+    print('Round 3')
+
+    functional_main()
+
+    print('Round 4')
+
+    functional_main()
+
+    print('Round 5')
+
+    functional_main()
     # init(robot1, robot3, robot2)
-    help(HexagonMaze.get_status().__doc__)
+
     pass

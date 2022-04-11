@@ -40,6 +40,32 @@ class Animal:
         self.animal_path.append(animal_choice.position_vector)  # append choice animal makes to list to keep track
         return animal_choice  # return position vector of the robot chosen
 
+    def make_user_choice(self):
+        """
+        User can make choice of which platform the animal moves to.
+        :return: User choice of platform for animal
+        """
+        robot_list = self.maze.robot_list.copy()  # create copy of robot list
+        animal_robot_class = self.maze.get_animal_robot_class()
+
+        robot_list.remove(animal_robot_class)  # remove the class of the robot on which the animal is on
+        # list of robots' names
+        robot_name_list = []
+        for robot in robot_list:
+            robot_name_list.append(robot.name)
+
+
+        while True:
+            try:
+                user_input = int(input(f'Which robot would you like to choose from the following list? \n{robot_name_list}'))
+                break
+
+            except ValueError:
+                print('Invalid Input. Try again.')
+
+        return robot_list[user_input-1]
+
+
     def change_animal_class(self, new_animal_class):
         """Based on choice (random by default), change the class of the animal robot and non-animal robot"""
 

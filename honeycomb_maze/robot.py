@@ -113,9 +113,9 @@ class PlatformRobot:
         direction_to_axis = {0: 'x', 1: 'y', 2: 'z', 3: 'x', 4: 'y', 5: 'z'}
         axis = direction_to_axis[self.direction]
         # step back and forth for the position vector
-
+        print(self.position_vector)
         movement_choices = []
-        step_list = [1, -2]
+        step_list = [1, -1]
         for step in step_list:
             movement_choices.append(self.get_change_position(axis, step))
         return movement_choices
@@ -294,7 +294,7 @@ class PlatformRobot:
         ---
         Since due to the position of the robots, the NNAR robot should always be facing the NAR
         """
-        print(self.name, 'position vector', self.position_vector)
+        print(f'The robot {self.name}, has position {self.position_vector}')
         rel_pos = self.non_animal_relative_position(self.position_vector)
         print('DEBUGGING: relative position', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
@@ -314,8 +314,10 @@ class PlatformRobot:
         animal_movement_choices = self.maze.get_outer_ring_coordinates(animal_robot_class.position_vector)
         # return intersection of lists
         self_movement_choices = self.move_no_rotation()
-        print('animal_movement_choices', animal_movement_choices)
-        print('self_movement_choices', self_movement_choices)
+        print(f'The AR {animal_robot_class.name}, is in position {animal_robot_class.position_vector} has choices',
+              animal_movement_choices)
+        print(f'The NAR {self.name}, is in position {self.position_vector} has choices',
+              self_movement_choices)
 
         def common_elements(list1, list2):
             result = []
@@ -327,6 +329,10 @@ class PlatformRobot:
         # get common element
         common_element = common_elements(animal_movement_choices, self_movement_choices)
         # assign new position vector
+
+        def flatten(t):
+            return [item for sublist in t for item in sublist]
+        print('COMMON ELEMENT',common_element)
         self.position_vector = common_element[0]
         return self.position_vector
 
