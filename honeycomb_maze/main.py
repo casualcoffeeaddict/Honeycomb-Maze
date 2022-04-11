@@ -4,7 +4,7 @@ from maze import *
 from robot import *
 
 # Start Logging
-logging.basicConfig(filename='version2/maze.log', encoding='utf-8')
+logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
@@ -26,20 +26,6 @@ robot3.set_maze(hm)
 robot1.set_animal_robot(True)
 
 mouse.set_maze(hm)
-
-
-def init(AR, NAR, NNAR):
-    # set the AR, NAR, NNAR
-    AR.is_animal_robot = 'AR'
-    NAR.is_animal_robot = 'NAR'
-    NNAR.is_animal_robot = 'NNAR'
-
-    # place the animal on the platform
-    mouse.set_animal_position()
-
-    # status
-    hm.get_status()
-
 
 def functional_main():
     hm.get_status()
@@ -109,6 +95,57 @@ def functional_main():
     # print(mouse.animal_path)  # return the path of the animal
 
 
+def uncommented_functional_main():
+    hm.get_status()
+
+    # changes which animal is the correct animal class
+    animal_choice_class = mouse.make_user_choice()  # animal makes choice
+    mouse.change_animal_class(animal_choice_class)  # animal moves to its choice
+
+    hm.get_status()
+
+    # set the animal position
+    mouse.set_animal_position()  # change the position of the animal based on its movement
+
+    hm.get_status()
+
+    # GET THE CLASSES OF THE NON ANIMAL ROBOTS
+    nnar = hm.get_non_non_animal_robot_class()
+    nar = hm.get_non_animal_robot_class()
+    # SETTING PATHFINDING TARGETS
+    nnar.set_pathfinding_target_position()  # pathfinding position must not be the pathfinding position of the other robot.
+
+    nar.set_pathfinding_target_position()
+
+    # NNAR step back from NAR
+    nnar.step_back_from_NAR()
+    # pathfinding method
+    nnar.set_command_list()
+    # tell robot to execute command
+    nnar.execute_command_list()
+
+    hm.get_status()
+
+    # NAR moves to outer ring of AR
+
+    print(nar.move_to_animal_outer_ring())  # move the animal to the outer ring
+
+    nar.set_command_list()
+
+    # robot executes command
+    nar.execute_command_list()
+
+    hm.get_status()
+
+    # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
+    nar.move_to_inner_ring_animal()
+    nnar.move_to_inner_ring_animal()
+    # EXECUTE COMMAND
+    nar.execute_command_list()
+    nnar.execute_command_list()
+
+
+    hm.get_status()
 def main():
     # setting up which platform is which type for the path-finding
     robot1.is_animal_robot = 'AR'
@@ -205,6 +242,5 @@ if __name__ == '__main__':
     print('Round 5')
 
     functional_main()
-    # init(robot1, robot3, robot2)
 
-    pass
+    print('Mouse Path:', mouse.animal_path)

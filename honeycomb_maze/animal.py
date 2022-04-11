@@ -54,17 +54,19 @@ class Animal:
         for robot in robot_list:
             robot_name_list.append(robot.name)
 
-
         while True:
             try:
-                user_input = int(input(f'Which robot would you like to choose from the following list? \n{robot_name_list}'))
+                user_input = int(
+                    input(f'Which robot would you like to choose from the following list? \n{robot_name_list}'))
                 break
 
             except ValueError:
                 print('Invalid Input. Try again.')
 
-        return robot_list[user_input-1]
+        selected_robot = robot_list[user_input - 1]
+        self.animal_path.append(selected_robot.position_vector)
 
+        return selected_robot
 
     def change_animal_class(self, new_animal_class):
         """Based on choice (random by default), change the class of the animal robot and non-animal robot"""
