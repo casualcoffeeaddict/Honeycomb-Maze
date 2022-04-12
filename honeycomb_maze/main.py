@@ -207,6 +207,8 @@ def main():
     hm.get_status()
 
 
+
+
 if __name__ == '__main__':
     # main()
     # test()
@@ -230,17 +232,21 @@ if __name__ == '__main__':
     print('Round 2')
 
     functional_main()
-
-    print('Round 3')
-
-    functional_main()
-
-    print('Round 4')
-
-    functional_main()
-
-    print('Round 5')
-
-    functional_main()
+    #
+    # print('Round 3')
+    #
+    # functional_main()
+    #
+    # print('Round 4')
+    #
+    # functional_main()
+    #
+    # print('Round 5')
+    #
+    # functional_main()
 
     print('Mouse Path:', mouse.animal_path)
+
+    mouse.output_animal_path()
+
+
