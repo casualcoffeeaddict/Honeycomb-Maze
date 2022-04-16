@@ -144,8 +144,8 @@ def uncommented_functional_main():
     nar.execute_command_list()
     nnar.execute_command_list()
 
-
     hm.get_status()
+
 def main():
     # setting up which platform is which type for the path-finding
     robot1.is_animal_robot = 'AR'

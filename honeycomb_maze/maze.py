@@ -14,7 +14,17 @@ class HexagonGrid:
 
 
 class HexagonMaze(HexagonGrid):
-    """Maze area for hexagonal platform"""
+    """
+    Maze area for hexagonal platform
+
+    Parameters
+    ----------
+    :param column_number:
+    :parameter row_number:
+    Returns
+    ----------
+    :return: Maze Network of the area of that is possible for the platforms to move around in
+    """
 
     def __init__(self, column_number, row_number):
         super().__init__(column_number, row_number)
@@ -36,7 +46,7 @@ class HexagonMaze(HexagonGrid):
 
     def get_status(self):
         """Return the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
-        print('\n \n========STATUS OF THE MAZE========')
+        print('\n \n======== STATUS OF THE MAZE ========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
         for robot in self.robot_list:
@@ -46,7 +56,7 @@ class HexagonMaze(HexagonGrid):
         for animal in self.animal_list:
             print(f'{animal.name} is in position {animal.position_vector}')
 
-        print('=======END OF STATUS UPDATE======= \n \n ')
+        print('======= END OF STATUS UPDATE ======= \n \n ')
 
     def set_goal(self, goal):
         """Set the goal for the animal to get to"""
@@ -61,8 +71,11 @@ class HexagonMaze(HexagonGrid):
         self.animal_list.append(animal)
 
     def generate_network(self):
-        """Makes the correctly labeled grid.
-        :returns hexagonal grid on which the platforms move around. From the size of the actual space 2
+        """
+        Makes the correctly labeled grid in the correct coordinate system
+
+        ------
+        :returns Network hexagonal grid on which the platforms move around. From the size of the actual space 2
 
         parameters:
         First is X dimension, second is Y dimension, where the X is the 'spikey' top surface and Y is the smooth side
