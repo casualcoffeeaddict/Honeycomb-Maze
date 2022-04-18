@@ -32,10 +32,7 @@ class PlatformRobot:
         self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
         self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
 
-    # def ssh_connect(self, ip_address, username, password):
-    #     self.name = paramiko.SSHClient()
-    #     self.name.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    #     self.name.connect(ip_address, username, password)
+
 
     def set_maze(self, maze_class):
         """Set the maze in which the robot is in"""
@@ -60,12 +57,17 @@ class PlatformRobot:
                 # Write function makes non animal robot with 2 consecutive robots the NAR
                 # and the non consecutive non animal robot NNAR
 
-    def relative_direction(self, position_vector, ):
+    def get_relative_direction(self, position_vector, ):
         """get the direction of the robot with respect to the grid (i.e. relative to the North)"""
         pass
 
     def get_change_position(self, axis, step):
-        """Move position vector around the board"""
+        """
+        Move position vector around the board
+        The positivon vector of the robot would not be updated, however
+        ------
+        :return [x, y, z]: Coordinates of the position vector that the robot would move to
+        """
         x = self.position_vector[0]
         y = self.position_vector[1]
         z = self.position_vector[2]
@@ -469,6 +471,13 @@ class PlatformRobot:
         command_list = self.make_command_list(self.path_list)
         # set the path list
         self.command_list = command_list
+
+    # Methods for SSH
+
+    def ssh_connect(self, ip_address, username, password):
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh.connect(ip_address, username, password)
 
     def execute_command_list(self):
         """
