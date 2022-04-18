@@ -22,14 +22,14 @@ class Animal:
         self.position_vector = self.maze.get_animal_robot_class().position_vector
 
     def set_maze(self, maze):
-        """Tell the animal and the maze that they both exist"""
+        """Assigns the name for the animal object and the maze object to eachother"""
         self.maze = maze
         self.maze.add_animal(self)
 
     def make_random_movement_choice(self):
         """Makes random choice of platform to move to
         ---
-        :return class of the selected robot platform
+        :return class of the selected robot platform:
         """
         robot_list = self.maze.robot_list.copy()  # create copy of robot list
         animal_robot_class = self.maze.get_animal_robot_class()
@@ -55,26 +55,25 @@ class Animal:
         for robot in robot_list:
             robot_name_list.append(robot.name)
 
-        if self.check_robot_choices(robot_list) == False:
+        # if self.check_robot_choices(robot_list) == False:
             # continue the rest of the code as if there is no duplicate choice
-            while True:
-                try:
-                    user_input = int(
-                        input(f'Which robot would you like to choose from the following list? \n{robot_name_list}'))
-                    break
+        while True:
+            try:
+                user_input = int(input(f'Which robot would you like to choose from the following list? \n{robot_name_list}'))
+                break
 
-                except ValueError:
-                    print('Invalid Input. Try entering a number.')
+            except ValueError:
+                print('Invalid Input. Try entering a number.')
 
-            # make sure the robot list
-            selected_robot = robot_list[user_input - 1]
-            self.animal_path.append(selected_robot.position_vector)
+        # make sure the robot list
+        selected_robot = robot_list[user_input - 1]
+        self.animal_path.append(selected_robot.position_vector)
 
-            return selected_robot
+        return selected_robot
 
-        else:
-            # reallocate potential choices for the animal to move to
-            pass
+        # else:
+        #     # reallocate potential choices for the animal to move to
+        #     pass
     def record_robot_choices(self, robot_choice_list):
         """Add the choice that has been given to a list for records"""
         # get the position vectors of the robots that are a choice for the animal
@@ -87,7 +86,7 @@ class Animal:
     def check_robot_choices(self, robot_choice_list):
         """
         Check if the choice the animal is presented with has already been given.
-        :return: True this choice has already been given,
+        :return True: this choice has already been given,
         False if this choice has not already been given.
         """
         # get the position vectors of the robots that are a choice for the animal
@@ -105,7 +104,12 @@ class Animal:
 
 
     def change_animal_class(self, new_animal_class):
-        """Based on choice (random by default), change the class of the animal robot and non-animal robot"""
+        """
+        Based on choice of the new_anima_class,
+        the change the class of the animal robot and non-animal robot are changed
+        ------
+        :parameter new_animal_class: This must be a robot in the maze
+        """
 
         # change class for robot list
         for robot in self.maze.robot_list:
@@ -126,9 +130,7 @@ class Animal:
 
     def output_animal_path(self, show_output=True):
         """
-        Outputs a file
-        :return
-
+        Saves a file of the path the animal took through the maze.
         Default value for this will be the output be True so their will be an output
         """
 
@@ -136,6 +138,6 @@ class Animal:
             with open(f'logs/animal_path_{self.name}.txt', 'w') as file:
                 for path in self.animal_path:
                     file.write(str(path)) # path
-                    f
+                    file.write()
                     file.write('\n')
             file.close()

@@ -19,8 +19,8 @@ class HexagonMaze(HexagonGrid):
 
     Parameters
     ----------
-    :param column_number:
-    :parameter row_number:
+    :param column_number: The number of rows of the hexagonal space
+    :parameter row_number: The number of columns of the hexagonal space
     Returns
     ----------
     :return: Maze Network of the area of that is possible for the platforms to move around in
@@ -45,7 +45,7 @@ class HexagonMaze(HexagonGrid):
         self.set_network()
 
     def get_status(self):
-        """Return the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
+        """Prints the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
         print('\n \n======== STATUS OF THE MAZE ========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
@@ -59,15 +59,27 @@ class HexagonMaze(HexagonGrid):
         print('======= END OF STATUS UPDATE ======= \n \n ')
 
     def set_goal(self, goal):
-        """Set the goal for the animal to get to"""
+        """
+        The goal of that animal is trying to reach
+        ------
+        :parameter goal: The coordinates of the goal for the animal (x, y, x) is format
+        """
         self.goal = goal
 
     def add_robot(self, robot):
-        """Adds animals to the maze's list of robots, self.robot_list"""
+        """
+        Adds animals to the maze's list of robots, self.robot_list
+        ------
+        :parameter robot: The name fo the robot object that will be added to self.robot_list
+        """
         self.robot_list.append(robot)
 
     def add_animal(self, animal):
-        """Adds animals to the maze's list of animals, self.animal_list"""
+        """
+        Adds animals to the maze's list of animals, self.animal_list
+        ------
+        :parameter animal: The name of the animal object that will be added to self.animal_list
+        """
         self.animal_list.append(animal)
 
     def generate_network(self):
@@ -83,7 +95,7 @@ class HexagonMaze(HexagonGrid):
 
         def node_generation(row, col):
 
-            def pairwise(iterable):  # function to iterate through objects in parirs
+            def pairwise(iterable):
                 "s -> (s0, s1), (s2, s3), (s4, s5), ..."
                 a = iter(iterable)
                 return zip(a, a)
@@ -270,28 +282,36 @@ class HexagonMaze(HexagonGrid):
         return self.temp_movement_network
 
     def make_temp_movement_network(self, moving_robot_class):
-        """Generate the network that the robots will have to traverse"""
+        """
+        Generate the network that the robots will have to traverse
+        """
         self.set_consecutive_positions(moving_robot_class)
         self.remove_consecutive_positions()
         return self.temp_movement_network
 
     def get_animal_robot_class(self):
-        """:returns the class of the animal robot (where there is only one animal robot)"""
+        """
+        :returns the class of the animal robot (where there is only one animal robot)
+        """
         for robot in self.robot_list:
             if robot.is_animal_robot == 'AR':
                 return robot
-            else:
-                print('ERROR: There is no animal robot in the maze')
-                logging.error('ERROR: there is no animal robot in the maze')
-
+            # else:
+            #     print('ERROR: There is no animal robot in the maze')
+            #     logging.error('ERROR: there is no animal robot in the maze')
 
     def get_non_animal_robot_class(self):
-        """:returns list of the non-animal class objects from self.robot_list"""
+        """
+        :return class of the robots in the robot list that are the non animal robot:
+        """
         for robot in self.robot_list:
             if robot.is_animal_robot == 'NAR':
                 return robot
 
     def get_non_non_animal_robot_class(self):
+        """
+        :return class of the robots in the robot list that are the non-non animal robot:
+        """
         for robot in self.robot_list:
             if robot.is_animal_robot == 'NNAR':
                 return robot

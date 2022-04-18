@@ -86,7 +86,9 @@ class PlatformRobot:
             logging.error('Select correct dimension, either x, y, z')
 
     def change_position(self, axis, step):
-        """Move position vector around the board"""
+        """
+        Move position vector around the board
+        """
         x = self.position_vector[0]
         y = self.position_vector[1]
         z = self.position_vector[2]
@@ -110,14 +112,22 @@ class PlatformRobot:
             logging.error('Select correct dimension, either x, y, z')
 
     def move_no_rotation(self):
+        """
+        For the robot self, this function will return the position vectors of the movements
+        that are possible for the robot to make without any rotation.
+        NOTE: this will not change the value of the position vector for robot.
+        :return movement choices: list of position vectors that are valid
+        """
+
         direction_to_axis = {0: 'x', 1: 'y', 2: 'z', 3: 'x', 4: 'y', 5: 'z'}
         axis = direction_to_axis[self.direction]
         # step back and forth for the position vector
         print(self.position_vector)
         movement_choices = []
-        step_list = [1, -1]
+        step_list = [0, 1, -1]
         for step in step_list:
             movement_choices.append(self.get_change_position(axis, step))
+
         return movement_choices
 
     def get_target_position(self):

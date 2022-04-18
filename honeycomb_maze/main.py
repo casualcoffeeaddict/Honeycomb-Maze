@@ -10,7 +10,7 @@ logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 # Instantiate maze
 hm = HexagonMaze(column_number=15, row_number=15)
 # Instantiate robots
-robot1 = PlatformRobot(3, 5, -8, 1, 'robot1')
+robot1 = PlatformRobot(3, 5, -8, 3, 'robot1')
 robot2 = PlatformRobot(2, 5, -7, 2, 'robot2')
 robot3 = PlatformRobot(3, 4, -7, 1, 'robot3')
 
@@ -32,7 +32,7 @@ def functional_main():
 
     # changes which animal is the correct animal class
     animal_choice_class = mouse.make_user_choice()  # animal makes choice
-    # print('animal choice', animal_choice_class.name)
+    print('animal choice', animal_choice_class.name)
     # print(hm.get_animal_robot_class() == animal_choice_class)
     mouse.change_animal_class(animal_choice_class)  # animal moves to its choice
 
@@ -208,45 +208,25 @@ def main():
 
 
 
+def test():
+
+    # print(robot1.move_no_rotation())
+    pass
+
+
+def run_programe(run_no):
+    run = 0
+    while run <= run_no:
+        print(f"Round {run}")
+        functional_main()
+
+        run = run + 1
 
 if __name__ == '__main__':
-    # main()
-    # test()
 
-    # robot1.is_animal_robot = 'AR'
-    # robot2.is_animal_robot = 'NNAR'
-    # robot3.is_animal_robot = 'NAR'
 
     # print(hm.get_animal_robot_class().position_vector)
-
-    # run = 0
-    # while run <= 3:
-    #     print(f"Round {run}")
-    #     functional_main()
-    #
-    #     run = run + 1
-    print('Round 1')
-
-    functional_main()
-
-    print('Round 2')
-
-    functional_main()
-    #
-    # print('Round 3')
-    #
-    # functional_main()
-    #
-    # print('Round 4')
-    #
-    # functional_main()
-    #
-    # print('Round 5')
-    #
-    # functional_main()
-
-    print('Mouse Path:', mouse.animal_path)
-
-    mouse.output_animal_path()
-
-
+    run_programe(3)
+    # print('Mouse Path:', mouse.animal_path)
+    # mouse.output_animal_path()
+    pass
