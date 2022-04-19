@@ -283,7 +283,11 @@ class PlatformRobot:
         return outer_ring
 
     def move_to_outer_ring(self, direction):
-        """Move to outer ring"""
+        """
+        Moves to the outer ring of the animal robot based on the self.robot's relative position
+        :param direction: Relative position
+        :return outer_ring_move:
+        """
         outer_ring_move = [
             self.change_position(self.ring_dim[direction],
                                  self.outer_ring_steps[direction])]
@@ -393,14 +397,21 @@ class PlatformRobot:
         self.move_list = self.get_move_list()
 
     def turn_robot(self, move):
-        """Method for make_command_list: returns the number of turns required to get to the next move"""
+        """
+        Method for make_command_list: returns the number of turns required to get to the next move
+        """
         # from self.direction, return the number of turns required to get the correct direction
         direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
         turns = direction_difference % 6
         return turns
 
     def path_relative_position(self, path_position_vector, current_position_vector):
-        """Get the relative position between two robots"""
+        """
+
+        :param path_position_vector:
+        :param current_position_vector:
+        :return relative_position: Relative position of the self robot compared with the position vector
+        """
         # subtract the two position vectors to return relative position vector
         # print(animal_robot.position_vector, non_animal_robot.position_vector)
         x, y, z = [p_i - m_i for p_i, m_i in zip(path_position_vector, current_position_vector)]
@@ -429,7 +440,9 @@ class PlatformRobot:
         and then the moves it will make come sequentially after
 
         Format for output: [turns, steps, turns, steps...] for the number of elements in the list
-
+        ------
+        :param path_list: The list of coordinates that the robot passes through
+        :return command_list: The commands the robot will need to excute to get to follow the path of coordinates
         """
         command_list = []
         for move in path_list[1:]:
@@ -475,6 +488,14 @@ class PlatformRobot:
     # Methods for SSH
 
     def ssh_connect(self, ip_address, username, password):
+        """
+        Connects the robot via ssh
+        ------
+        :param ip_address: IP address of robot
+        :param username: Username of the robot
+        :param password: Password of the robot
+
+        """
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(ip_address, username, password)
