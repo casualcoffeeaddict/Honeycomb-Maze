@@ -306,7 +306,7 @@ class PlatformRobot:
                                  self.outer_ring_steps[direction])]
         return inner_ring_move
 
-    def step_back_from_NAR(self):
+    def step_back_from_NAR(self, execute = True):
         """
         Step backwards (away from the other robots)
         ---
@@ -317,8 +317,13 @@ class PlatformRobot:
         print('DEBUGGING: relative position', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
         # add
+        if execute:
+            self.step_back_from_NAR_execute()
 
         return self.move_to_inner_ring(rel_pos)
+
+    def step_back_from_NAR_execute(self):
+        self.execute_command('1, 1')
 
     def move_to_animal_outer_ring(self):
         """
@@ -348,8 +353,9 @@ class PlatformRobot:
         common_element = common_elements(animal_movement_choices, self_movement_choices)
         # assign new position vector
 
-        def flatten(t):
-            return [item for sublist in t for item in sublist]
+        # def flatten(t):
+        #     return [item for sublist in t for item in sublist]
+
         print('COMMON ELEMENT',common_element)
         self.position_vector = common_element[0]
         return self.position_vector
