@@ -9,11 +9,11 @@ logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
-hm = HexagonMaze(column_number=15, row_number=15)
+hm = HexagonMaze(column_number=13 , row_number=15)
 # Instantiate robots
-robot1 = PlatformRobot(3, 5, -8, 3, 'robot1')
-robot2 = PlatformRobot(2, 5, -7, 2, 'robot2')
-robot3 = PlatformRobot(3, 4, -7, 1, 'robot3')
+robot1 = PlatformRobot(3, 5, -8, 1, '192.168.0.101', 'robot1')
+robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', 'robot2')
+robot3 = PlatformRobot(3, 4, -7, 1, '192.168.0.106', 'robot3')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -33,7 +33,7 @@ def functional_main():
     print('MOUSE CHOICE')
     # changes which animal is the correct animal class
     animal_choice_class = mouse.make_user_choice()  # animal makes choice
-    print('animal choice', animal_choice_class.name)
+    print('Robot Selected:', animal_choice_class.name)
     # print(hm.get_animal_robot_class() == animal_choice_class)
     mouse.change_animal_class(animal_choice_class)  # animal moves to its choice
 
@@ -53,10 +53,10 @@ def functional_main():
     # print(nnar.name)
     # SETTING PATHFINDING TARGETS
     nnar.set_pathfinding_target_position()  # pathfinding position must not be the pathfinding position of the other robot.
-    print('nnar\n\n', nnar.target_position)
+    print('\n\nnnar target position', nnar.target_position)
 
     nar.set_pathfinding_target_position()
-    print('nar\n\n', nar.target_position)
+    print('\n\nnar target position', nar.target_position)
 
     hm.get_status()
     pause()
@@ -222,11 +222,12 @@ def main():
 
 def test():
 
-    # print(robot1.move_no_rotation())
+
+    robot1.execute_command('1 1 ')
     pass
 
 
-def run_programe(run_no):
+def run_program(run_no):
     run = 0
     while run <= run_no:
         print(f"Round {run}")
@@ -237,8 +238,5 @@ def run_programe(run_no):
 if __name__ == '__main__':
 
 
-    # print(hm.get_animal_robot_class().position_vector)
-    run_programe(3)
-    # print('Mouse Path:', mouse.animal_path)
-    # mouse.output_animal_path()
+    run_program(1)
     pass

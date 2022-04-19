@@ -6,13 +6,15 @@ import paramiko
 
 
 # from connect import *
+username = 'root'
 
 
 class PlatformRobot:
 
-    def __init__(self, x, y, z, direction, *name):
+    def __init__(self, x, y, z, direction, ip_address, *name):
         # (Optional) identity of Robot
         self.name = name
+        self.ssh_connect(ip_address)
         # Position of robot
         self.position_vector = [x, y, z]
         # Orientation of robot
@@ -439,13 +441,15 @@ class PlatformRobot:
         First element of path-list will be next position vector of the robot,
         and then the moves it will make come sequentially after
 
-        Format for output: [turns, steps, turns, steps...] for the number of elements in the list
+        Format for output: [Turn around (0, 1)] [steps] [turns, steps, turns, steps...] for the number of elements in the list
         ------
         :param path_list: The list of coordinates that the robot passes through
         :return command_list: The commands the robot will need to excute to get to follow the path of coordinates
         """
         command_list = []
         for move in path_list[1:]:
+            #
+
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
@@ -480,14 +484,16 @@ class PlatformRobot:
     def set_command_list(self):
         # get path from pathfinder function
         self.path_list = self.maze.pathfinder(self)
+        print(self.path_list)
         # make command list from path list
         command_list = self.make_command_list(self.path_list)
+        print(command_list)
         # set the path list
         self.command_list = command_list
 
     # Methods for SSH
 
-    def ssh_connect(self, ip_address, username, password):
+    def ssh_connect(self, ip_address , username='root', password=''):
         """
         Connects the robot via ssh
         ------
@@ -498,11 +504,14 @@ class PlatformRobot:
         """
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh.connect(ip_address, username, password)
+        self.ssh.connect(ip_address, port=22, username=username, password=password,
+                    pkey=None, key_filename=None, timeout=None, allow_agent=True,
+                    look_for_keys=True, compress=False)
 
     def execute_command_list(self):
         """
-        Before this command is run, the command list must be initialised
+        Before this command is run, the command list must by the self.ssh_connect() command which is done in the
+        __init__ function
 
         WILL MOVE ROBOTS!
         Send the commands to the robot to move
@@ -513,10 +522,14 @@ class PlatformRobot:
             # make list into string of numbers
             command_string = ' '.join(map(str, self.command_list))
             # send command
-            # stdin, stdout, sterr = self.name.exec_command(f'./lineFollowJunction4 {command_string}')
-            print(f'./lineFollowJunction4 {command_string}')
+            stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
+            print(f'./lineFollowJunction11 {command_string}')
             # to prevent commands being executed twice, clear the command list
             self.command_list = None
-
             # reset the target position
             self.target_position = None
+
+    def execute_command(self, command_string):
+        # send command
+        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11t {command_string}')
+        print(f'./lineFollowJunction11 {command_string}')
