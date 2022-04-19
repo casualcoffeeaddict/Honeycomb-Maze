@@ -364,7 +364,6 @@ class PlatformRobot:
 
         inner_ring_move = self.get_change_position(self.ring_dim[direction],
                                                     self.outer_ring_steps[direction])
-
         return inner_ring_move
 
     def move_to_inner_ring_animal(self):
