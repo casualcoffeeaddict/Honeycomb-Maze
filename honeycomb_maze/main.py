@@ -2,6 +2,7 @@
 from animal import *
 from maze import *
 from robot import *
+from static_methods import *
 
 # Start Logging
 logging.basicConfig(filename='logs/maze.log', encoding='utf-8')

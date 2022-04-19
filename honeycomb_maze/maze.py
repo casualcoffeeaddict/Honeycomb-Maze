@@ -23,7 +23,7 @@ class HexagonMaze(HexagonGrid):
     Parameters
     ----------
     :param column_number: The number of rows of the hexagonal space
-    :parameter row_number: The number of columns of the hexagonal space
+    :param row_number: The number of columns of the hexagonal space
     Returns
     ----------
     :return: Maze Network of the area of that is possible for the platforms to move around in
