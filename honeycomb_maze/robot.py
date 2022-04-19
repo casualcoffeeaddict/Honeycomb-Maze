@@ -317,13 +317,13 @@ class PlatformRobot:
         print('DEBUGGING: relative position', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
         # add
-        if execute:
+        if execute == True:
             self.step_back_from_NAR_execute()
-
+        # set the value for direction to 'opposite' of what it was before
         return self.move_to_inner_ring(rel_pos)
 
     def step_back_from_NAR_execute(self):
-        self.execute_command('1, 1')
+        self.execute_command('1 1')
 
     def move_to_animal_outer_ring(self):
         """
@@ -446,15 +446,13 @@ class PlatformRobot:
         First element of path-list will be next position vector of the robot,
         and then the moves it will make come sequentially after
 
-        Format for output: [Turn around (0, 1)] [steps] [turns, steps, turns, steps...] for the number of elements in the list
+        Format for output: [Turn around (True = 0, False = 1)] [steps] [turns, steps, turns, steps...] for the number of elements in the list
         ------
         :param path_list: The list of coordinates that the robot passes through
         :return command_list: The commands the robot will need to excute to get to follow the path of coordinates
         """
         command_list = []
         for move in path_list[1:]:
-            #
-
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
@@ -536,5 +534,5 @@ class PlatformRobot:
 
     def execute_command(self, command_string):
         # send command
-        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11t {command_string}')
+        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
         print(f'./lineFollowJunction11 {command_string}')
