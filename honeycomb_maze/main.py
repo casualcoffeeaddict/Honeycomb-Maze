@@ -29,7 +29,7 @@ mouse.set_maze(hm)
 
 def functional_main():
     hm.get_status()
-
+    print('MOUSE CHOICE')
     # changes which animal is the correct animal class
     animal_choice_class = mouse.make_user_choice()  # animal makes choice
     print('animal choice', animal_choice_class.name)
@@ -42,9 +42,11 @@ def functional_main():
     mouse.set_animal_position()  # change the position of the animal based on its movement
 
     hm.get_status()
+    hm.pause()
 
     # method for setting the target and pathfinding target
-    # GET THE CLASSES OF THE NON ANIMAL ROBOTS
+
+    print('GET THE CLASSES OF THE NON ANIMAL ROBOTS')
     nnar = hm.get_non_non_animal_robot_class()
     nar = hm.get_non_animal_robot_class()
     # print(nnar.name)
@@ -55,6 +57,10 @@ def functional_main():
     nar.set_pathfinding_target_position()
     print('nar\n\n', nar.target_position)
 
+    hm.get_status()
+    hm.pause()
+
+    print('NNAR step back from NAR')
     # NNAR step back from NAR
     nnar.step_back_from_NAR()
     # pathfinding method
@@ -63,7 +69,9 @@ def functional_main():
     nnar.execute_command_list()
 
     hm.get_status()
+    hm.pause()
 
+    print('NAR moves to outer ring of AR')
     # NAR moves to outer ring of AR
     # print('start', nar.position_vector)
     # print(hm.get_animal_robot_class())
@@ -76,8 +84,10 @@ def functional_main():
     nar.execute_command_list()
 
     hm.get_status()
+    hm.pause()
 
     # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
+    print('BOTH MOVE TO INNER RING')
     nar.move_to_inner_ring_animal()
     nnar.move_to_inner_ring_animal()
 
@@ -86,6 +96,7 @@ def functional_main():
     # EXECUTE COMMAND
 
     hm.get_status()
+    hm.pause()
 
     # nar_command_list =
 

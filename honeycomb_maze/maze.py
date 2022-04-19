@@ -366,7 +366,11 @@ class HexagonMaze(HexagonGrid):
     #     direction = moving_robot_class.animal_relative_position(moving_robot_class.position_vector)
     #     moving_robot_class.move_to_outer_ring(direction)
 
-
+    def pause(self, bool = True):
+        if bool:
+            pause = input('Would you like to continue?')
+        else:
+            pass
 def main():
     pass
 
