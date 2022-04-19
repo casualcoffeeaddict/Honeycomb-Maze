@@ -346,27 +346,12 @@ class HexagonMaze(HexagonGrid):
 
         return nx.shortest_path(self.temp_movement_network, source=tuple(start), target=tuple(target))
 
-    # def pathfinder_loop_1(self, moving_robot_class):
-    #     # step 1 - will be different for NAR and NNAR
-    #     first_move = []
-    #     if moving_robot_class.is_animal_robot == 'NNAR':
-    #         first_move.append(moving_robot_class.step_back_from_NAR())
-    #     if moving_robot_class.is_animal_robot == 'NAR':
-    #         first_move.append(moving_robot_class.move_to_animal_outer_ring())
-    #
-    #     # generate pathfinding network for a given robot to path find around
-    #     self.make_temp_movement_network(moving_robot_class)
-    #     # path find around this network to final outer ring positions
-    #     path = self.pathfinder(moving_robot_class)
-    #
-    #     return moving_robot_class.make_command_list(path)
-
-    # def pathfinder_loop_2(self, moving_robot_class):
-    #     """Move both non-animal robots (NAR & NNAR) to the inner ring at the same time"""
-    #     direction = moving_robot_class.animal_relative_position(moving_robot_class.position_vector)
-    #     moving_robot_class.move_to_outer_ring(direction)
-
     def pause(self, bool = True):
+        """
+        Function to pause the code
+        :param bool: True = will pause, False = Will not be used. Default value set to True
+        :return: Will pause the code
+        """
         if bool:
             pause = input('Would you like to continue?')
         else:
