@@ -42,7 +42,7 @@ def functional_main():
     mouse.set_animal_position()  # change the position of the animal based on its movement
 
     hm.get_status()
-    hm.pause()
+    pause()
 
     # method for setting the target and pathfinding target
 
@@ -58,7 +58,7 @@ def functional_main():
     print('nar\n\n', nar.target_position)
 
     hm.get_status()
-    hm.pause()
+    pause()
 
     print('NNAR step back from NAR')
     # NNAR step back from NAR
@@ -69,7 +69,7 @@ def functional_main():
     nnar.execute_command_list()
 
     hm.get_status()
-    hm.pause()
+    pause()
 
     print('NAR moves to outer ring of AR')
     # NAR moves to outer ring of AR
@@ -84,7 +84,7 @@ def functional_main():
     nar.execute_command_list()
 
     hm.get_status()
-    hm.pause()
+    pause()
 
     # BOTH ARE IN THE OUTER RING IN CORRECT RELATIVE POSITION
     print('BOTH MOVE TO INNER RING')
@@ -96,7 +96,7 @@ def functional_main():
     # EXECUTE COMMAND
 
     hm.get_status()
-    hm.pause()
+    pause()
 
     # nar_command_list =
 
