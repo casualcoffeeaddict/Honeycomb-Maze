@@ -1,5 +1,6 @@
 """Maze class"""
 import logging
+
 import networkx as nx
 
 
@@ -11,9 +12,6 @@ class HexagonGrid:
         self.rows = row_number
         # name of the maze
         self.name = name
-
-
-
 
 
 class HexagonMaze(HexagonGrid):
@@ -49,11 +47,13 @@ class HexagonMaze(HexagonGrid):
 
     def get_status(self):
         """Prints the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
+        direction_to_axis = {0: 'y', 1: 'z', 2: 'x', 3: 'y', 4: 'z', 5: 'x'}
         print('\n \n======== STATUS OF THE MAZE ========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
         for robot in self.robot_list:
-            print(f'{robot.name} is in position {robot.position_vector}, with direction {robot.direction} and its the {robot.is_animal_robot}')
+            print(
+                f'{robot.name} is in position {robot.position_vector}, with direction {direction_to_axis[robot.direction]} and its the {robot.is_animal_robot}')
 
         print('Position of Animals:')
         for animal in self.animal_list:
@@ -85,7 +85,7 @@ class HexagonMaze(HexagonGrid):
         """
         self.animal_list.append(animal)
 
-    def generate_network(self):
+    def generate_network(self, rows, columns):
         """
         Makes the correctly labeled grid in the correct coordinate system
 
@@ -180,13 +180,13 @@ class HexagonMaze(HexagonGrid):
 
             return graph
 
-        return make_network(self.rows, self.columns, I)
+        return make_network(rows, columns, I)
 
     def set_network(self):
         """
         Sets the network of points (in networkx) for which the robots can move around in
         """
-        self.movement_network = self.generate_network()
+        self.movement_network = self.generate_network(self.rows, self.columns)
 
     def get_inner_ring_coordinates(self, position_vector):
         """

@@ -9,11 +9,12 @@ logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
-hm = HexagonMaze(column_number=13 , row_number=15)
+hm = HexagonMaze(column_number=13, row_number=15)
 # Instantiate robots
-robot1 = PlatformRobot(3, 5, -8, 1, '192.168.0.101', 'robot1')
-robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', 'robot2')
-robot3 = PlatformRobot(3, 4, -7, 1, '192.168.0.106', 'robot3')
+execute = False
+robot1 = PlatformRobot(3, 5, -8, 5, '192.168.0.101', execute, 'robot1')
+robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
+robot3 = PlatformRobot(3, 4, -7, 1, '192.168.0.106', execute, 'robot3')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -28,7 +29,8 @@ robot1.set_animal_robot(True)
 
 mouse.set_maze(hm)
 
-def functional_main():
+
+def functional_main(execute=False, manual=False):
     hm.get_status()
     print('MOUSE CHOICE')
     # changes which animal is the correct animal class
@@ -52,10 +54,11 @@ def functional_main():
     nar = hm.get_non_animal_robot_class()
     # print(nnar.name)
     # SETTING PATHFINDING TARGETS
-    nnar.set_pathfinding_target_position()  # pathfinding position must not be the pathfinding position of the other robot.
+    nnar.set_pathfinding_target_position(
+        manual)  # pathfinding position must not be the pathfinding position of the other robot.
     print('\n\nnnar target position', nnar.target_position)
 
-    nar.set_pathfinding_target_position()
+    nar.set_pathfinding_target_position(manual)
     print('\n\nnar target position', nar.target_position)
 
     hm.get_status()
@@ -63,11 +66,11 @@ def functional_main():
 
     print('NNAR step back from NAR')
     # NNAR step back from NAR
-    nnar.step_back_from_NAR()
+    nnar.step_back_from_NAR(execute)
     # pathfinding method
     nnar.set_command_list()
     # tell robot to execute command
-    nnar.execute_command_list()
+    nnar.execute_command_list(execute)
 
     hm.get_status()
     pause()
@@ -82,7 +85,7 @@ def functional_main():
     nar.set_command_list()
     # print(nar.command_list)
     # robot executes command
-    nar.execute_command_list()
+    nar.execute_command_list(execute)
 
     hm.get_status()
     pause()
@@ -92,8 +95,8 @@ def functional_main():
     nar.move_to_inner_ring_animal()
     nnar.move_to_inner_ring_animal()
 
-    nar.execute_command_list()
-    nnar.execute_command_list()
+    nar.execute_command_list(execute)
+    nnar.execute_command_list(execute)
     # EXECUTE COMMAND
 
     hm.get_status()
@@ -158,6 +161,7 @@ def uncommented_functional_main():
 
     hm.get_status()
 
+
 def main():
     # setting up which platform is which type for the path-finding
     robot1.is_animal_robot = 'AR'
@@ -219,24 +223,36 @@ def main():
     hm.get_status()
 
 
-
 def test():
+    robot3.is_animal_robot = 'NAR'
+    hm.get_status()
+    robot2.step_back_from_NAR(False)
+    hm.get_status()
+    pass
 
 
-    robot1.execute_command('1 1 ')
+def test_2():
+    hm.get_status()
+    print(robot1.make_command_list([(3, 5, -8), (3,4,-7),
+                                    (4,3,-7), (4,2,6)
+                              ])
+          )
+    hm.get_status()
+
     pass
 
 
 def run_program(run_no):
     run = 0
     while run <= run_no:
-        print(f"Round {run}")
+        print(f"START OF RUN {run}")
         functional_main()
-
+        print(f"END OF RUN {run}")
         run = run + 1
 
+
 if __name__ == '__main__':
-
-
-    run_program(1)
+    # run_program(1)
+    # test()
+    test_2()
     pass
