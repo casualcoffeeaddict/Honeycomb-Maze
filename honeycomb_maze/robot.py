@@ -4,17 +4,16 @@ from random import choice
 
 import paramiko
 
-
 # from connect import *
 username = 'root'
 
 
 class PlatformRobot:
 
-    def __init__(self, x, y, z, direction, ip_address, *name):
+    def __init__(self, x, y, z, direction, ip_address, execute, *name):
         # (Optional) identity of Robot
         self.name = name
-        self.ssh_connect(ip_address)
+        self.ssh_connect(execute, ip_address)
         # Position of robot
         self.position_vector = [x, y, z]
         # Orientation of robot
@@ -31,10 +30,10 @@ class PlatformRobot:
         self.maze = None
         # For moving to and from inner and outer ring
         self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
-        self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
-        self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
+        self.inner_ring_steps = [1, 1, -1, -1, -1, 1]
+        self.outer_ring_steps = [-1, -1, 1, 1, 1, -1]
 
-
+        self.direction_to_axis = {0: 'y', 1: 'z', 2: 'x', 3: 'y', 4: 'z', 5: 'x'}
 
     def set_maze(self, maze_class):
         """Set the maze in which the robot is in"""
@@ -45,8 +44,8 @@ class PlatformRobot:
         """Set the robot which has the animal on it and sets the other robots to 2
         ---
         AR = is animal robot
-        NAR = in t-1 was animal robot
-        NNAR = in t-1 was not animal robot
+        NAR = in move t-1 was animal robot
+        NNAR = in move t-1 was not animal robot
 
         """
         if bool == True:
@@ -123,8 +122,7 @@ class PlatformRobot:
         :return movement choices: list of position vectors that are valid
         """
 
-        direction_to_axis = {0: 'x', 1: 'y', 2: 'z', 3: 'x', 4: 'y', 5: 'z'}
-        axis = direction_to_axis[self.direction]
+        axis = self.direction_to_axis[self.direction]
         # step back and forth for the position vector
         print(self.position_vector)
         movement_choices = []
@@ -134,7 +132,7 @@ class PlatformRobot:
 
         return movement_choices
 
-    def get_target_position(self):
+    def get_target_position(self, manual=False):
         """
         Get a target position vector which is valid in the following ways:
         1. It must not be the current position of a robot
@@ -159,21 +157,27 @@ class PlatformRobot:
                 if list(robot.target_position) in choices:
                     choices.remove(list(robot.target_position))
                 else:
-                    print(f"INFO: The robot,{robot.name}'s target position was not in the list of choices. It was {robot.target_position}")
+                    print(
+                        f"INFO: The robot,{robot.name}'s target position was not in the list of choices. It was {robot.target_position}")
 
         print(choices)
         logging.info(choices)
         # 2. It must be in the outer ring and a valid relative position
 
-        return tuple(choice(choices))
+        # For debugging, making choices manual or not
+        if manual == False:
+            return tuple(choice(choices))
+        elif manual == True:
+            index = int(input('What is the index of the position you would like to choose from this list?'))
+            return choices[index - 1]
 
-    def set_pathfinding_target_position(self, ):
+    def set_pathfinding_target_position(self, manual=False):
         """Based on the target position, the pathfinding target position also has to be set
         INFO:
         self.target_position is the place where the robot wants to go
         self.pathfinding_target_position is the place where the pathfinding for networkx will aim for
         """
-        target_position = self.get_target_position()  # get target position
+        target_position = self.get_target_position(manual)  # get target position
         target_rel_position = self.animal_relative_position(target_position)  # get relative position of target
 
         rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
@@ -237,7 +241,7 @@ class PlatformRobot:
         non_animal_robot = self.maze.get_non_animal_robot_class()
         # subtract the two position vectors to return relative position vector
         # print(animal_robot.position_vector, non_animal_robot.position_vector)
-        x, y, z = [a_i - n_i for a_i, n_i in zip(non_animal_robot.position_vector, position_vector)]
+        x, y, z = [a_i - n_i for a_i, n_i in zip(position_vector, non_animal_robot.position_vector)]
         print('NAR Relative position vector', x, y, z)
         logging.info('NAR Relative position vector', x, y, z)
         if x == 0 and y == 0 and z == 0:
@@ -284,29 +288,29 @@ class PlatformRobot:
             outer_ring.append(consecutive_position)
         return outer_ring
 
-    def move_to_outer_ring(self, direction):
+    def move_to_outer_ring(self, res_pos):
         """
-        Moves to the outer ring of the animal robot based on the self.robot's relative position
-        :param direction: Relative position
+        Moves to the outer ring of the animal robot based on the self.robot's relative position to the animal robot
+        :param res_pos: Relative position
         :return outer_ring_move:
         """
         outer_ring_move = [
-            self.change_position(self.ring_dim[direction],
-                                 self.outer_ring_steps[direction])]
+            self.change_position(self.ring_dim[res_pos],
+                                 self.outer_ring_steps[res_pos])]
         return outer_ring_move
 
-    def move_to_inner_ring(self, direction):
+    def move_to_inner_ring(self, rel_pos):
         """Move to inner ring"""
         # print('DEBUGGING', self.ring_dim[direction],
         #       self.inner_ring_steps[direction])
         # logging.debug('DEBUGGING', self.ring_dim[direction],
         #       self.inner_ring_steps[direction])
         inner_ring_move = [
-            self.change_position(self.ring_dim[direction],
-                                 self.outer_ring_steps[direction])]
+            self.change_position(self.ring_dim[rel_pos],
+                                 self.inner_ring_steps[rel_pos])]
         return inner_ring_move
 
-    def step_back_from_NAR(self, execute = True):
+    def step_back_from_NAR(self, execute=True):
         """
         Step backwards (away from the other robots)
         ---
@@ -316,14 +320,16 @@ class PlatformRobot:
         rel_pos = self.non_animal_relative_position(self.position_vector)
         print('DEBUGGING: relative position', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
+        # flip direction of robot
+        self.direction = (self.direction + 3) % 6
         # add
-        if execute == True:
+        if execute:
             self.step_back_from_NAR_execute()
-        # set the value for direction to 'opposite' of what it was before
-        return self.move_to_inner_ring(rel_pos)
+
+        return self.move_to_outer_ring(rel_pos)
 
     def step_back_from_NAR_execute(self):
-        self.execute_command('1 1')
+        self.execute_command('1, 1')
 
     def move_to_animal_outer_ring(self):
         """
@@ -356,14 +362,14 @@ class PlatformRobot:
         # def flatten(t):
         #     return [item for sublist in t for item in sublist]
 
-        print('COMMON ELEMENT',common_element)
+        print('COMMON ELEMENT', common_element)
         self.position_vector = common_element[0]
         return self.position_vector
 
     def get_move_to_inner_ring(self, direction):
 
         inner_ring_move = self.get_change_position(self.ring_dim[direction],
-                                                    self.outer_ring_steps[direction])
+                                                   self.outer_ring_steps[direction])
         return inner_ring_move
 
     def move_to_inner_ring_animal(self):
@@ -403,15 +409,6 @@ class PlatformRobot:
     def set_move_list(self):
         self.move_list = self.get_move_list()
 
-    def turn_robot(self, move):
-        """
-        Method for make_command_list: returns the number of turns required to get to the next move
-        """
-        # from self.direction, return the number of turns required to get the correct direction
-        direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
-        turns = direction_difference % 6
-        return turns
-
     def path_relative_position(self, path_position_vector, current_position_vector):
         """
 
@@ -439,6 +436,15 @@ class PlatformRobot:
         else:
             print(f'The robot {self.name} can not move to this position ')
 
+    def turn_robot(self, move):
+        """
+        Method for make_command_list: returns the number of turns required to get to point in the correct direction
+        """
+        # from self.direction, return the number of turns required to get the correct direction
+        direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
+        turns = direction_difference % 6
+        return turns
+
     def make_command_list(self, path_list):
         """
         From the move list convert it to a set of commands to be sent to the associated robot
@@ -446,17 +452,27 @@ class PlatformRobot:
         First element of path-list will be next position vector of the robot,
         and then the moves it will make come sequentially after
 
-        Format for output: [Turn around (True = 0, False = 1)] [steps] [turns, steps, turns, steps...] for the number of elements in the list
+        Format for output: [Turn around (0, 1)] [steps] [turns, steps, turns, steps...] for the number of elements in the list
+
+        Since no turning around takes place the first command will be 0 AND the sequence will start with asking
+        how many turns are required second command (for steps) will be 0
         ------
         :param path_list: The list of coordinates that the robot passes through
         :return command_list: The commands the robot will need to excute to get to follow the path of coordinates
+
+
         """
-        command_list = []
-        for move in path_list[1:]:
+        command_list = [0, 0]
+        for move in path_list[1:]: # starts at second entry in list as the first entry is the
+            # starting position of the robot
+
+
+            #
+            print(self.direction, self.path_relative_position(move, self.position_vector))
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
-                print('INFO: 0 added')
+                print('INFO: Direction the same, 0 added')
                 logging.info('INFO: 0 added')
                 command_list.append(0)
             elif self.direction != self.path_relative_position(move, self.position_vector):
@@ -496,7 +512,7 @@ class PlatformRobot:
 
     # Methods for SSH
 
-    def ssh_connect(self, ip_address , username='root', password=''):
+    def ssh_connect(self, execute, ip_address, username='root', password=''):
         """
         Connects the robot via ssh
         ------
@@ -505,13 +521,14 @@ class PlatformRobot:
         :param password: Password of the robot
 
         """
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh.connect(ip_address, port=22, username=username, password=password,
-                    pkey=None, key_filename=None, timeout=None, allow_agent=True,
-                    look_for_keys=True, compress=False)
+        if execute == True:
+            self.ssh = paramiko.SSHClient()
+            self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.ssh.connect(ip_address, port=22, username=username, password=password,
+                             pkey=None, key_filename=None, timeout=None, allow_agent=True,
+                             look_for_keys=True, compress=False)
 
-    def execute_command_list(self):
+    def execute_command_list(self, execute):
         """
         Before this command is run, the command list must by the self.ssh_connect() command which is done in the
         __init__ function
@@ -519,20 +536,21 @@ class PlatformRobot:
         WILL MOVE ROBOTS!
         Send the commands to the robot to move
         """
-        if self.command_list == None:
-            print('The command list is empty')
-        elif self.command_list != None:
-            # make list into string of numbers
-            command_string = ' '.join(map(str, self.command_list))
-            # send command
-            stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
-            print(f'./lineFollowJunction11 {command_string}')
-            # to prevent commands being executed twice, clear the command list
-            self.command_list = None
-            # reset the target position
-            self.target_position = None
+        if execute == True:
+            if self.command_list == None:
+                print('The command list is empty')
+            elif self.command_list != None:
+                # make list into string of numbers
+                command_string = ' '.join(map(str, self.command_list))
+                # send command
+                stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
+                print(f'./lineFollowJunction11 {command_string}')
+                # to prevent commands being executed twice, clear the command list
+                self.command_list = None
+                # reset the target position
+                self.target_position = None
 
     def execute_command(self, command_string):
         # send command
-        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
+        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11t {command_string}')
         print(f'./lineFollowJunction11 {command_string}')

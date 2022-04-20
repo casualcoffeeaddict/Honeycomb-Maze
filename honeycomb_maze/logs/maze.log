@@ -261,3 +261,5 @@ ERROR:root:ERROR: there is no animal robot in the maze
 ERROR:root:ERROR: there is no animal robot in the maze
 ERROR:root:ERROR: there is no animal robot in the maze
 ERROR:root:ERROR: there is no animal robot in the maze
+ERROR:root:The robot ('robot1',) is off axis (its position is invalid because it is off axis), or robot is at origin.
+ERROR:root:Select correct dimension, either x, y, z
