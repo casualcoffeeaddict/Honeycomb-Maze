@@ -32,6 +32,7 @@ class HexagonMaze(HexagonGrid):
         # List of the object names of the robots that are present in the maze
         self.consecutive_positions = []
         self.robot_list = []
+        self.non_moving_robot_list = None
         self.animal_list = []
         # move list of class
         self.valid_moves = None
@@ -67,7 +68,11 @@ class HexagonMaze(HexagonGrid):
         ------
         :parameter goal: The coordinates of the goal for the animal (x, y, x) is format
         """
-        self.goal = goal
+        # Check the goal is in the correct format
+        if type(goal) == tuple:
+            self.goal = goal
+        else:
+            print('Type of goal was incorrect. Please format goal in (x, y, z)')
 
     def add_robot(self, robot):
         """
@@ -90,9 +95,10 @@ class HexagonMaze(HexagonGrid):
         Makes the correctly labeled grid in the correct coordinate system
 
         ------
-        :returns Network hexagonal grid on which the platforms move around. From the size of the actual space 2
+        :param rows: Number of rows in the square grid space
+        :param columns: Number of columsn in the square grid space
 
-        parameters:
+        :returns Network hexagonal grid on which the platforms move around. From the size of the actual space 2
         First is X dimension, second is Y dimension, where the X is the 'spikey' top surface and Y is the smooth side
         """
 
@@ -191,6 +197,8 @@ class HexagonMaze(HexagonGrid):
     def get_inner_ring_coordinates(self, position_vector):
         """
         Returns a list of all the consecutive positions around a particular position vector
+        ------
+        :param position_vector: the position vector that for which the inner ring will be found
         """
         inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1], [-1, 0, 1], [-1, 1, 0], [0, 1, -1]]
         consecutive_coordinate_list = []
@@ -208,7 +216,8 @@ class HexagonMaze(HexagonGrid):
 
     def get_outer_ring_coordinates(self, position_vector):
         """
-        Returns a list of all the positions that are in the outer ring (ring of radius 2)
+        :returns outer_ring_coordinates: list of all the positions that are in the outer ring (ring of radius 2)
+        list of all the positions that are in the outer ring (ring of radius 2)
         around a particular coordinate
         """
         outer_ring = [[2, 0, -2], [2, -1, -1],
@@ -233,7 +242,10 @@ class HexagonMaze(HexagonGrid):
         From the robot positions, select the positions and consecutive positions of the non-moving robots
         from the network
         and
-        returns a list of tuples that are consecutive to the robots in the network
+        returns a
+        ------
+        :param moving_robot_class: The class of the robot not moving
+        :return formatted_consecutive_position_list: list of tuples that are consecutive to the robots in the network
         """
         # Non-moving robots position list
         robot_position_list = []
@@ -251,8 +263,7 @@ class HexagonMaze(HexagonGrid):
                 consecutive_position_list.append(c)
         consecutive_position_list.sort()
 
-        # Formatting
-
+        # define formatting functions
         def remove_duplicates(coordinate_list):
             new_coordinate_list = []
             for elem in coordinate_list:
@@ -266,31 +277,44 @@ class HexagonMaze(HexagonGrid):
                 new_coordinate_list.append(tuple(c))
             return new_coordinate_list
 
-        return list_to_tuples(remove_duplicates(consecutive_position_list))
+        # run the formatting functions
+        formatted_consecutive_position_list = remove_duplicates(consecutive_position_list)
+        formatted_consecutive_position_list = list_to_tuples(formatted_consecutive_position_list)
+
+        return formatted_consecutive_position_list
 
     def set_consecutive_positions(self, moving_robot_class):
         self.consecutive_positions = self.get_consecutive_positions(moving_robot_class)
 
-    def remove_consecutive_positions(self):
-        """Remove the positions that are consecutive to the robots and update self.temp_movement_network"""
-        self.temp_movement_network = self.movement_network.copy()  # create copy of movement network
-        for i in range(len(self.consecutive_positions)):
-            position = self.consecutive_positions[i]
-            if position in list(self.temp_movement_network.nodes):
-                self.temp_movement_network.remove_node(position)
-            else:
-                print('ERROR: A node that is not in the network is trying to be removed')
-        print('The positions consecutive to any other robot have been removed from the temp_movement_network')
-        logging.info('The positions consecutive to any other robot have been removed from the temp_movement_network')
-        return self.temp_movement_network
+
 
     def make_temp_movement_network(self, moving_robot_class):
         """
         Generate the network that the robots will have to traverse
         """
-        self.set_consecutive_positions(moving_robot_class)
-        self.remove_consecutive_positions()
-        return self.temp_movement_network
+        def remove_consecutive_positions(temp_movement_network, consecutive_positions):
+            """Remove the positions that are consecutive to the robots and update self.temp_movement_network"""
+            print('No of nodes of temp network', len(temp_movement_network.nodes))
+            print(len(consecutive_positions))
+            for position in consecutive_positions:
+                if position in list(temp_movement_network.nodes):
+                    temp_movement_network.remove_node(position)
+                else:
+                    print('ERROR: A node that is not in the network is trying to be removed')
+            print('The positions consecutive to any other robot have been removed from the temp_movement_network')
+            logging.info(
+                'The positions consecutive to any other robot have been removed from the temp_movement_network')
+            print('No of nodes of temp network', len(temp_movement_network.nodes))
+            return temp_movement_network
+
+        # Make temp movement network (this resets every time the function is called]
+        self.temp_movement_network = self.movement_network.copy()
+        # get consecutive positions of the robots that are not the moving robot class
+        consecutive_positions = self.get_consecutive_positions(moving_robot_class)
+        # remove consecutive positions from the temp_network
+        temp_movement_network = remove_consecutive_positions(self.temp_movement_network, consecutive_positions)
+
+        return temp_movement_network
 
     def get_animal_robot_class(self):
         """
@@ -326,28 +350,29 @@ class HexagonMaze(HexagonGrid):
         elif self.get_animal_robot_class() != self.goal:
             return False
 
-    def pathfinder(self, non_animal_robot):
+    def pathfinder(self, moving_robot_class):
         """
         Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
         algorithm
 
         Parameters
         ----------
-        non_animal_robot = the robot that is just about to move
+        :param moving_robot_class: the robot that is just about to move
+        :return shortest_path: A list of tuples that is the shortest path between the pathfinding target and source
         """
-        print(non_animal_robot.name)
-        logging.debug(non_animal_robot.name)
+        print(moving_robot_class.name)
+        logging.debug(moving_robot_class.name)
 
-        start = non_animal_robot.position_vector
-        target = non_animal_robot.pathfinding_target_position
+        # getting the pathfinding target and start
+        source = moving_robot_class.position_vector
+        target = moving_robot_class.pathfinding_target_position
 
-        self.remove_consecutive_positions()
+        temp_movement_network = self.make_temp_movement_network(moving_robot_class)
 
-        # print('Nodes in network', network)
-        logging.debug('\nPathfinding Source:', tuple(start), '\nPathfinding Target:', tuple(target))
-        print('\nPathfinding Source:', tuple(start), '\nPathfinding Target:', tuple(target))
+        logging.debug('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
+        print('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
 
-        return nx.shortest_path(self.temp_movement_network, source=tuple(start), target=tuple(target))
+        return nx.shortest_path(temp_movement_network, source=tuple(source), target=tuple(target))
 
 
 def main():

@@ -2,6 +2,8 @@
 import logging
 from random import choice
 
+from static_methods import *
+
 import paramiko
 
 # from connect import *
@@ -29,9 +31,11 @@ class PlatformRobot:
         # Maze robot is placed in
         self.maze = None
         # For moving to and from inner and outer ring
-        self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
-        self.inner_ring_steps = [1, 1, -1, -1, -1, 1]
-        self.outer_ring_steps = [-1, -1, 1, 1, 1, -1]
+        self.ring_dim =         ['y', 'z', 'x',  'y', 'z', 'x']
+        self.inner_ring_steps = [-1,  -1,    1,   1,   1,  -1]
+        self.outer_ring_steps = [ 1,   1,   -1,  -1,  -1,   1]
+
+        self.rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
 
         self.direction_to_axis = {0: 'y', 1: 'z', 2: 'x', 3: 'y', 4: 'z', 5: 'x'}
 
@@ -171,6 +175,15 @@ class PlatformRobot:
             index = int(input('What is the index of the position you would like to choose from this list?'))
             return choices[index - 1]
 
+    def set_pathfinding_source_position(self):
+
+        # get the source position
+        source_position = self.position_vector
+        # get the pathfinding source position
+        source_rel_position = self.animal_relative_position(source_position)
+        move = self.rel_inner_ring[source_rel_position]
+        source_target_position = [a_i + n_i for a_i, n_i in zip(source_position, move)]
+
     def set_pathfinding_target_position(self, manual=False):
         """Based on the target position, the pathfinding target position also has to be set
         INFO:
@@ -180,8 +193,8 @@ class PlatformRobot:
         target_position = self.get_target_position(manual)  # get target position
         target_rel_position = self.animal_relative_position(target_position)  # get relative position of target
 
-        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
-        move = rel_inner_ring[target_rel_position]
+        # rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        move = self.rel_inner_ring[target_rel_position]
         # get position of target based on relative position
         pathfinding_target_position = [a_i + n_i for a_i, n_i in zip(target_position, move)]
 
@@ -272,31 +285,31 @@ class PlatformRobot:
 
     def get_consecutive_position(self):
         """Get the positions that are in the inner ring of the robot's current position"""
-        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        # rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
         inner_ring = []
-        for coord in rel_inner_ring:
+        for coord in self.rel_inner_ring:
             consecutive_position = [a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
             inner_ring.append(consecutive_position)
         return inner_ring
 
     def get_outer_ring_position(self):
         """Get the positions that are in the inner ring of the robot's current position"""
-        rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        # rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
         outer_ring = []
-        for coord in rel_inner_ring:
+        for coord in self.rel_inner_ring:
             consecutive_position = [2 * a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
             outer_ring.append(consecutive_position)
         return outer_ring
 
-    def move_to_outer_ring(self, res_pos):
+    def move_to_outer_ring(self, rel_pos):
         """
         Moves to the outer ring of the animal robot based on the self.robot's relative position to the animal robot
-        :param res_pos: Relative position
+        :param rel_pos: Relative position
         :return outer_ring_move:
         """
         outer_ring_move = [
-            self.change_position(self.ring_dim[res_pos],
-                                 self.outer_ring_steps[res_pos])]
+            self.change_position(self.ring_dim[rel_pos],
+                                 self.outer_ring_steps[rel_pos])]
         return outer_ring_move
 
     def move_to_inner_ring(self, rel_pos):
@@ -318,17 +331,30 @@ class PlatformRobot:
         """
         print(f'The robot {self.name}, has position {self.position_vector}')
         rel_pos = self.non_animal_relative_position(self.position_vector)
-        print('DEBUGGING: relative position', rel_pos)
+        print('DEBUGGING: relative position:', rel_pos)
         logging.debug('DEBUGGING: relative position', rel_pos)
-        # flip direction of robot
+
+        # Robot turns around
+        # new position of the robot (back one step)
+        new_position = self.move_to_outer_ring(rel_pos)
+        self.position_vector = tuple(flatten(new_position))
+
+        # flip direction of robot since the robot turns around
         self.direction = (self.direction + 3) % 6
-        # add
+
+        # send commands to ssh to do this
         if execute:
             self.step_back_from_NAR_execute()
 
-        return self.move_to_outer_ring(rel_pos)
+        return new_position
 
     def step_back_from_NAR_execute(self):
+        """
+        Execute the 'turn around' command which the robot requires to 'see' where it is going with the IR sensor at the
+        front
+        ------
+        :return:
+        """
         self.execute_command('1, 1')
 
     def move_to_animal_outer_ring(self):
@@ -348,28 +374,21 @@ class PlatformRobot:
         print(f'The NAR {self.name}, is in position {self.position_vector} has choices',
               self_movement_choices)
 
-        def common_elements(list1, list2):
-            result = []
-            for element in list1:
-                if element in list2:
-                    result.append(element)
-            return result
-
-        # get common element
+        # get common element (ie the option that is available for the robot to move to
         common_element = common_elements(animal_movement_choices, self_movement_choices)
-        # assign new position vector
-
-        # def flatten(t):
-        #     return [item for sublist in t for item in sublist]
-
+        # assign this as the new position vector
         print('COMMON ELEMENT', common_element)
         self.position_vector = common_element[0]
         return self.position_vector
 
-    def get_move_to_inner_ring(self, direction):
+    def get_move_to_inner_ring(self, rel_pos):
+        """
 
-        inner_ring_move = self.get_change_position(self.ring_dim[direction],
-                                                   self.outer_ring_steps[direction])
+        :param rel_pos:
+        :return inner_ring_move:
+        """
+        inner_ring_move = self.get_change_position(self.ring_dim[rel_pos],
+                                                   self.outer_ring_steps[rel_pos])
         return inner_ring_move
 
     def move_to_inner_ring_animal(self):
@@ -379,16 +398,13 @@ class PlatformRobot:
         return the value (should only be one) that intersects with possible movements
         without rotation with the outer ring
         """
-        self.path_list = [self.position_vector]
+        self.path_list = [self.position_vector] # initial position of
 
         rel_pos = self.animal_relative_position(self.position_vector)  # get relative position of animal robot
         move = self.get_move_to_inner_ring(rel_pos)
         print('rel_pos', rel_pos)
         print('move', move)
         print(self.position_vector)
-
-        def flatten(t):
-            return [item for sublist in t for item in sublist]
 
         self.path_list.append(list(move))
         print(self.path_list)
@@ -462,13 +478,10 @@ class PlatformRobot:
 
 
         """
+        # starting command
         command_list = [0, 0]
         for move in path_list[1:]: # starts at second entry in list as the first entry is the
-            # starting position of the robot
-
-
-            #
-            print(self.direction, self.path_relative_position(move, self.position_vector))
+            # print(self.direction, self.path_relative_position(move, self.position_vector))
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn

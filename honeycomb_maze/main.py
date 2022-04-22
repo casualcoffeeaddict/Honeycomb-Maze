@@ -222,23 +222,17 @@ def main():
 
     hm.get_status()
 
-
 def test():
-    robot3.is_animal_robot = 'NAR'
+    robot2.is_animal_robot = 'NAR'
     hm.get_status()
-    robot2.step_back_from_NAR(False)
+
+    robot1.step_back_from_NAR(False)
+
     hm.get_status()
     pass
 
 
 def test_2():
-    hm.get_status()
-    print(robot1.make_command_list([(3, 5, -8), (3,4,-7),
-                                    (4,3,-7), (4,2,6)
-                              ])
-          )
-    hm.get_status()
-
     pass
 
 
@@ -252,7 +246,7 @@ def run_program(run_no):
 
 
 if __name__ == '__main__':
-    # run_program(1)
+    run_program(1)
     # test()
-    test_2()
+    # test_2()
     pass
