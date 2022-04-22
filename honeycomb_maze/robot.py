@@ -31,9 +31,9 @@ class PlatformRobot:
         # Maze robot is placed in
         self.maze = None
         # For moving to and from inner and outer ring
-        self.ring_dim =         ['y', 'z', 'x',  'y', 'z', 'x']
-        self.inner_ring_steps = [-1,  -1,    1,   1,   1,  -1]
-        self.outer_ring_steps = [ 1,   1,   -1,  -1,  -1,   1]
+        self.ring_dim = ['y', 'z', 'x', 'y', 'z', 'x']
+        self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
+        self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
 
         self.rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
 
@@ -398,7 +398,7 @@ class PlatformRobot:
         return the value (should only be one) that intersects with possible movements
         without rotation with the outer ring
         """
-        self.path_list = [self.position_vector] # initial position of
+        self.path_list = [self.position_vector]  # initial position of
 
         rel_pos = self.animal_relative_position(self.position_vector)  # get relative position of animal robot
         move = self.get_move_to_inner_ring(rel_pos)
@@ -480,7 +480,7 @@ class PlatformRobot:
         """
         # starting command
         command_list = [0, 0]
-        for move in path_list[1:]: # starts at second entry in list as the first entry is the
+        for move in path_list[1:]:  # starts at second entry in list as the first entry is the
             # print(self.direction, self.path_relative_position(move, self.position_vector))
             # Handle turns
             if self.direction == self.path_relative_position(move, self.position_vector):
