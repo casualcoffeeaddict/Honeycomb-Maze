@@ -529,6 +529,7 @@ class PlatformRobot:
         """
         Connects the robot via ssh
         ------
+        :param execute: Boolean to determine if the commands will be executed
         :param ip_address: IP address of robot
         :param username: Username of the robot
         :param password: Password of the robot
