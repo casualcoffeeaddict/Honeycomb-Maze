@@ -41,5 +41,8 @@ def main():
     # print(robot1.direction)
     pass
 
+
+
+print(dict)
 if __name__ == "__main__":
     main()

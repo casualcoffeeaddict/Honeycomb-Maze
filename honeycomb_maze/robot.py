@@ -1,13 +1,11 @@
 """Robot Class"""
 import logging
-from random import choice
+import random
+import paramiko
 
 from static_methods import *
 
-import paramiko
 
-# from connect import *
-username = 'root'
 
 
 class PlatformRobot:
@@ -170,7 +168,7 @@ class PlatformRobot:
 
         # For debugging, making choices manual or not
         if manual == False:
-            return tuple(choice(choices))
+            return tuple(random.choice(choices))
         elif manual == True:
             index = int(input('What is the index of the position you would like to choose from this list?'))
             return choices[index - 1]

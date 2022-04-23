@@ -1,6 +1,6 @@
 """Maze class"""
 import logging
-
+import random
 import networkx as nx
 
 
@@ -194,6 +194,40 @@ class HexagonMaze(HexagonGrid):
         """
         self.movement_network = self.generate_network(self.rows, self.columns)
 
+    def get_animal_robot_class(self):
+        """
+        :returns the class of the animal robot (where there is only one animal robot)
+        """
+        for robot in self.robot_list:
+            if robot.is_animal_robot == 'AR':
+                return robot
+            # else:
+            #     print('ERROR: There is no animal robot in the maze')
+            #     logging.error('ERROR: there is no animal robot in the maze')
+
+    def get_non_animal_robot_class(self):
+        """
+        :return class of the robots in the robot list that are the non animal robot:
+        """
+        for robot in self.robot_list:
+            if robot.is_animal_robot == 'NAR':
+                return robot
+
+    def get_non_non_animal_robot_class(self):
+        """
+        :return class of the robots in the robot list that are the non-non animal robot:
+        """
+        for robot in self.robot_list:
+            if robot.is_animal_robot == 'NNAR':
+                return robot
+
+    def check_animal_at_goal(self):
+        """Check if the animal position is at the position of the goal robot"""
+        if self.get_animal_robot_class() == self.goal:
+            return True
+        elif self.get_animal_robot_class() != self.goal:
+            return False
+
     def get_inner_ring_coordinates(self, position_vector):
         """
         Returns a list of all the consecutive positions around a particular position vector
@@ -286,12 +320,11 @@ class HexagonMaze(HexagonGrid):
     def set_consecutive_positions(self, moving_robot_class):
         self.consecutive_positions = self.get_consecutive_positions(moving_robot_class)
 
-
-
     def make_temp_movement_network(self, moving_robot_class):
         """
         Generate the network that the robots will have to traverse
         """
+
         def remove_consecutive_positions(temp_movement_network, consecutive_positions):
             """Remove the positions that are consecutive to the robots and update self.temp_movement_network"""
             print('No of nodes of temp network', len(temp_movement_network.nodes))
@@ -316,40 +349,6 @@ class HexagonMaze(HexagonGrid):
 
         return temp_movement_network
 
-    def get_animal_robot_class(self):
-        """
-        :returns the class of the animal robot (where there is only one animal robot)
-        """
-        for robot in self.robot_list:
-            if robot.is_animal_robot == 'AR':
-                return robot
-            # else:
-            #     print('ERROR: There is no animal robot in the maze')
-            #     logging.error('ERROR: there is no animal robot in the maze')
-
-    def get_non_animal_robot_class(self):
-        """
-        :return class of the robots in the robot list that are the non animal robot:
-        """
-        for robot in self.robot_list:
-            if robot.is_animal_robot == 'NAR':
-                return robot
-
-    def get_non_non_animal_robot_class(self):
-        """
-        :return class of the robots in the robot list that are the non-non animal robot:
-        """
-        for robot in self.robot_list:
-            if robot.is_animal_robot == 'NNAR':
-                return robot
-
-    def check_animal_at_goal(self):
-        """Check if the animal position is at the position of the goal robot"""
-        if self.get_animal_robot_class() == self.goal:
-            return True
-        elif self.get_animal_robot_class() != self.goal:
-            return False
-
     def pathfinder(self, moving_robot_class):
         """
         Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
@@ -373,6 +372,82 @@ class HexagonMaze(HexagonGrid):
         print('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
 
         return nx.shortest_path(temp_movement_network, source=tuple(source), target=tuple(target))
+
+    def get_target_positions(self, sample_size=2):
+
+        # get two target positions from the outer ring of the animal robot that are not occupied by other robots
+
+        # for each robot's position vector, find the path length to each target position
+
+        # the shortest path
+
+        """
+                Get a target position vector which is valid in the following ways:
+                1. It must not be the current position of a robot
+                2. It must be in the outer ring and a valid relative position
+                3. It must not be in the current pathfinding target position of the other non animal robot
+                """
+        animal_robot = self.get_animal_robot_class()
+        choices = self.get_inner_ring_coordinates(animal_robot.position_vector)
+        # 1. It must not be the current position of a robot
+        # remove positions of the animal coordinates
+        for robot in self.robot_list:
+            # remove the position of the robots from the 'choices' list
+            if robot.position_vector in choices:
+                choices.remove(robot.position_vector)
+            else:
+                print('INFO: Robot position vector not inside choice of target positions')
+                logging.info('INFO: Robot position vector not inside choice of target positions')
+
+            # remove the position of the other robot's target position
+
+            if robot.target_position != None:
+                if list(robot.target_position) in choices:
+                    choices.remove(list(robot.target_position))
+                else:
+                    print(
+                        f"INFO: The robot,{robot.name}'s target position was not in the list of choices. It was {robot.target_position}")
+
+        print(choices)
+
+
+        # make a list of tuples of length 'sample_size'
+        sample_list = random.sample(choices, sample_size)
+
+        def make_list_of_tuples(sample_list):
+            tuple_list = []
+            for position in sample_list:
+                tuple_list.append(tuple(position))
+            return tuple_list
+
+        tuple_list = make_list_of_tuples(sample_list)
+
+        # robot list without animal class created
+        robot_list = self.robot_list.copy()
+        robot_list.remove(animal_robot)
+        print(robot_list)
+
+        # length dictionary
+        length_dict = {}
+        length_list = []
+        index = 0
+        # for each robot:
+        for robot in robot_list:
+            # find the length of path to all targets
+            for target_position in tuple_list:
+                path_length = len(nx.shortest_path(self.make_temp_movement_network(robot), tuple(robot.position_vector), target_position))
+                # add to dictionary
+                # length_dict[path_length] = target_position
+
+                # add to list
+                length_list[index].append(path_length)
+
+
+            index += 1
+
+
+        print(length_list)
+
 
 
 def main():
