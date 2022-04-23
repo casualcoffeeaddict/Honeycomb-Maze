@@ -566,5 +566,5 @@ class PlatformRobot:
 
     def execute_command(self, command_string):
         # send command
-        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11t {command_string}')
+        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
         print(f'./lineFollowJunction11 {command_string}')
