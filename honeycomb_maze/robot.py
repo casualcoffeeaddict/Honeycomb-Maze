@@ -1,13 +1,11 @@
 """Robot Class"""
 import logging
-from random import choice
+import random
+import paramiko
 
 from static_methods import *
 
-import paramiko
 
-# from connect import *
-username = 'root'
 
 
 class PlatformRobot:
@@ -170,7 +168,7 @@ class PlatformRobot:
 
         # For debugging, making choices manual or not
         if manual == False:
-            return tuple(choice(choices))
+            return tuple(random.choice(choices))
         elif manual == True:
             index = int(input('What is the index of the position you would like to choose from this list?'))
             return choices[index - 1]
@@ -566,5 +564,5 @@ class PlatformRobot:
 
     def execute_command(self, command_string):
         # send command
-        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11t {command_string}')
+        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
         print(f'./lineFollowJunction11 {command_string}')
