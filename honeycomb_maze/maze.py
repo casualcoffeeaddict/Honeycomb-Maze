@@ -5,7 +5,9 @@ import networkx as nx
 
 
 class HexagonGrid:
-    """Base maze class which defines the area of the maze"""
+    """
+    Base maze class which defines the area of the maze
+    """
 
     def __init__(self, column_number, row_number, *name):
         self.columns = column_number

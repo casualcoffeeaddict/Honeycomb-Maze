@@ -12,9 +12,11 @@ logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 hm = HexagonMaze(column_number=13, row_number=15)
 # Instantiate robots
 execute = False
-robot1 = PlatformRobot(3, 5, -8, 5, '192.168.0.101', execute, 'robot1')
+robot1 = (3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
 robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
-robot3 = PlatformRobot(3, 4, -7, 1, '192.168.0.106', execute, 'robot3')
+robot3 = PlatformRobot(3, 4, -7, 4, '192.168.0.106', execute, 'robot3')
+
+robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -30,7 +32,7 @@ robot1.set_animal_robot(True)
 mouse.set_maze(hm)
 
 
-def functional_main(execute=False, manual=False):
+def functional_main(execute=True, manual=False):
     hm.get_status()
     print('MOUSE CHOICE')
     # changes which animal is the correct animal class
@@ -67,6 +69,8 @@ def functional_main(execute=False, manual=False):
     print('NNAR step back from NAR')
     # NNAR step back from NAR
     nnar.step_back_from_NAR(execute)
+
+    pause()
     # pathfinding method
     nnar.set_command_list()
     # tell robot to execute command
@@ -110,24 +114,44 @@ def functional_main(execute=False, manual=False):
     # print(mouse.animal_path)  # return the path of the animal
 
 
-
 def test():
     robot2.is_animal_robot = 'NAR'
+    robot3.is_animal_robot = 'NNAR'
     hm.get_status()
 
-
-    print(hm.get_target_positions())
+    robot3.step_back_from_NAR(True)
 
     hm.get_status()
     pass
 
 
 def test_2():
+    # robot1.ssh_connect(True, '192.168.0.101')
+    print(robot1.position_vector)
+    print(robot1.direction)
+    command = robot1.make_command_list([(3, 4, -7), (4,5,-9), (5,4,-9), (5,3,-9), (5,2,-7), (4,2,-6), (3,2,-5), (2,3,-5)
+
+                                        # (2,5,-7), (3, 5, -8), (2,6,-8), (3, 5, -8)
+                                        ]
+                                       )
+    command_string = ' '.join(map(str, command))
+    print(command_string)
+    # robot1.execute_command(command_string)
+    print(robot1.position_vector)
+    print(robot1.direction)
+    pass
+
+def test_3():
+    print(robot4.position_vector)
+    robot4.change_position('y', -1)
+    print(robot4.position_vector)
+
     pass
 
 
+
 def run_program(run_no):
-    run = 0
+    run = 1
     while run <= run_no:
         print(f"START OF RUN {run}")
         functional_main()
@@ -137,6 +161,7 @@ def run_program(run_no):
 
 if __name__ == '__main__':
     # run_program(1)
-    test()
-    # test_2()
+    # test()
+    test_2()
+    # test_3()
     pass

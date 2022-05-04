@@ -1,6 +1,5 @@
 """
-Static Methods
-
+Static Methods which are used in multiple places in the program
 """
 
 def pause(bool = True):

@@ -6,8 +6,6 @@ import paramiko
 from static_methods import *
 
 
-
-
 class PlatformRobot:
 
     def __init__(self, x, y, z, direction, ip_address, execute, *name):
@@ -33,7 +31,7 @@ class PlatformRobot:
         self.inner_ring_steps = [-1, -1, 1, 1, 1, -1]
         self.outer_ring_steps = [1, 1, -1, -1, -1, 1]
 
-        self.rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
+        self.rel_inner_ring = [[1, 0, -1], [1, -1, 0], [0, -1, 1],[-1, 0, +1], [-1, 1, 0], [0, 1, -1], ]
 
         self.direction_to_axis = {0: 'y', 1: 'z', 2: 'x', 3: 'y', 4: 'z', 5: 'x'}
 
@@ -103,7 +101,7 @@ class PlatformRobot:
             self.position_vector = [x, y, z]
             return self.position_vector
         elif axis == 'y':
-            x += step
+            x = x + step
             z -= step
             self.position_vector = [x, y, z]
             return self.position_vector
@@ -191,7 +189,6 @@ class PlatformRobot:
         target_position = self.get_target_position(manual)  # get target position
         target_rel_position = self.animal_relative_position(target_position)  # get relative position of target
 
-        # rel_inner_ring = [[-1, 0, +1], [-1, 1, 0], [0, 1, -1], [1, 0, -1], [1, -1, 0], [0, -1, 1]]
         move = self.rel_inner_ring[target_rel_position]
         # get position of target based on relative position
         pathfinding_target_position = [a_i + n_i for a_i, n_i in zip(target_position, move)]
@@ -423,9 +420,8 @@ class PlatformRobot:
     def set_move_list(self):
         self.move_list = self.get_move_list()
 
-    def path_relative_position(self, path_position_vector, current_position_vector):
+    def path_relative_position(self, path_position_vector, current_position_vector, ):
         """
-
         :param path_position_vector:
         :param current_position_vector:
         :return relative_position: Relative position of the self robot compared with the position vector
@@ -450,16 +446,23 @@ class PlatformRobot:
         else:
             print(f'The robot {self.name} can not move to this position ')
 
-    def turn_robot(self, move):
+    def turn_robot(self, move, clockwise=True):
         """
         Method for make_command_list: returns the number of turns required to get to point in the correct direction
         """
+        # Method for defining the axis in the clockwise relative positions or the anticlockwise relative positions
+        if clockwise == True:
+            modulus = 6
+        elif clockwise == False:
+            modulus = -6
+
+
         # from self.direction, return the number of turns required to get the correct direction
         direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
-        turns = direction_difference % 6
-        return turns
+        turns = direction_difference % modulus
+        return abs(turns)
 
-    def make_command_list(self, path_list):
+    def make_command_list(self, path_list, clockwise=True):
         """
         From the move list convert it to a set of commands to be sent to the associated robot
 
@@ -476,26 +479,33 @@ class PlatformRobot:
 
 
         """
+        if clockwise == True:
+            modulus = 6
+        elif clockwise == False:
+            modulus = -6
+
         # starting command
         command_list = [0, 0]
         for move in path_list[1:]:  # starts at second entry in list as the first entry is the
             # print(self.direction, self.path_relative_position(move, self.position_vector))
             # Handle turns
+            print(f'{move},{self.direction} ,{self.path_relative_position(move, self.position_vector)}')
             if self.direction == self.path_relative_position(move, self.position_vector):
                 # no need to turn
                 print('INFO: Direction the same, 0 added')
                 logging.info('INFO: 0 added')
                 command_list.append(0)
             elif self.direction != self.path_relative_position(move, self.position_vector):
-                turns = self.turn_robot(move)
+                turns = self.turn_robot(move, clockwise)
                 # make turns more efficient - quick fix
                 print(f'INFO: {turns} turns added')
-                logging.info(f'INFO: {turns} turns added')
                 command_list.append(turns)
                 # update the direction of the robot (ie add the number of turns it makes to the direction
                 # then remainder 6)
-                self.direction += turns
-                self.direction = self.direction % 6
+                print(f'Initial {self.direction}')
+                self.direction = turns + self.direction
+                self.direction = abs(self.direction % modulus)
+                print(f'Final {self.direction}')
 
             # Handle steps
             if self.position_vector == list(move):
@@ -503,7 +513,7 @@ class PlatformRobot:
                 pass
             elif self.position_vector != list(move):
                 # step forward 1
-                print('INFO: 1 added')
+                print('INFO: 1 step added')
                 logging.info('INFO: 1 added')
                 command_list.append(1)
                 # update position
@@ -555,8 +565,7 @@ class PlatformRobot:
                 # make list into string of numbers
                 command_string = ' '.join(map(str, self.command_list))
                 # send command
-                stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
-                print(f'./lineFollowJunction11 {command_string}')
+                self.execute_command(command_string)
                 # to prevent commands being executed twice, clear the command list
                 self.command_list = None
                 # reset the target position
@@ -566,3 +575,25 @@ class PlatformRobot:
         # send command
         stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
         print(f'./lineFollowJunction11 {command_string}')
+
+    def coordinate_callibration(self, position_vector):
+        """
+        UNFINISED AND DOESNT WORK
+        Go through relative position 0 - 5 in order to show the axis on the space
+        :param position_vector: The position from which the calibration takes place
+        :return:
+        """
+        position_vector = tuple(position_vector)
+        command_list = [position_vector]
+
+        for position in self.rel_inner_ring:
+            new_position = tuple([a_i + b_i for a_i, b_i in zip(position_vector, position)])
+            command_list.append(new_position)
+            command_list.append(position_vector)
+
+        print(command_list)
+        command = self.make_command_list(command_list)
+
+        command_string = ' '.join(map(str, command))
+        print(command_string)
+        self.execute_command(command_string)
