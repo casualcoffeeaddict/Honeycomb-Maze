@@ -342,6 +342,19 @@ class HexagonMaze(HexagonGrid):
             print('No of nodes of temp network', len(temp_movement_network.nodes))
             return temp_movement_network
 
+        def add_edge_to_outer_ring(self, temp_movement_network):
+            # get the corresponding move with no rotation to outer ring of network
+            if moving_robot_class.is_animal_robot() == 'NNAR':
+                # NAR if robot is NNAR
+                stationary_robot = self.get_non_animal_robot_class()
+            elif moving_robot_class.is_animal_robot() == 'NAR':
+                # AR if robot is NAR
+                stationary_robot = self.get_non_non_animal_robot_class()
+
+            legal_position = moving_robot_class.move_to_robot_outer_ring(stationary_robot)
+            temp_movement_network.add_edge(tuple(moving_robot_class.position_vector), legal_position)
+            return temp_movement_network
+
         # Make temp movement network (this resets every time the function is called]
         self.temp_movement_network = self.movement_network.copy()
         # get consecutive positions of the robots that are not the moving robot class
@@ -349,11 +362,34 @@ class HexagonMaze(HexagonGrid):
         # remove consecutive positions from the temp_network
         temp_movement_network = remove_consecutive_positions(self.temp_movement_network, consecutive_positions)
 
+        # add source and target
+        # temp_movement_network = add_edge_to_outer_ring(self, temp_movement_network)
+
         return temp_movement_network
+
+    def make_circular_movement_network(self, moving_robot_class):
+        """
+        Pathfinding function for circular robot platforms not hexagonal platforms
+        ---
+        :param moving_robot_class: the class of the robot that is going to move in the next move
+        :return temp_movement_network: The movement network that is required for the pathfinding of the
+        """
+        # make copy of movement network
+        self.temp_movement_network = self.movement_network.copy()
+        # get inner ring positions of stationary robots
+        consecutive_positions = self.get_consecutive_positions(moving_robot_class)
+        # add positions of non-moving robot classes
+
+        # make list of edges between nodes in (inner ring + AR.position_vector) then remove duplicates)
+
+        # remove these edges from the network
+
+        # find the shortest path
+        pass
 
     def pathfinder(self, moving_robot_class):
         """
-        Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfining
+        Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfinding
         algorithm
 
         Parameters
@@ -412,7 +448,6 @@ class HexagonMaze(HexagonGrid):
 
         print(choices)
 
-
         # make a list of tuples of length 'sample_size'
         sample_list = random.sample(choices, sample_size)
 
@@ -437,19 +472,17 @@ class HexagonMaze(HexagonGrid):
         for robot in robot_list:
             # find the length of path to all targets
             for target_position in tuple_list:
-                path_length = len(nx.shortest_path(self.make_temp_movement_network(robot), tuple(robot.position_vector), target_position))
+                path_length = len(nx.shortest_path(self.make_temp_movement_network(robot), tuple(robot.position_vector),
+                                                   target_position))
                 # add to dictionary
                 # length_dict[path_length] = target_position
 
                 # add to list
                 length_list[index].append(path_length)
 
-
             index += 1
 
-
         print(length_list)
-
 
 
 def main():

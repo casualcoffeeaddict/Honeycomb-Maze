@@ -352,6 +352,30 @@ class PlatformRobot:
         """
         self.execute_command('1, 1')
 
+    # def move_to_animal_outer_ring(self):
+    #     """
+    #     Method for the NAR robot
+    #     ---
+    #     return the value (should only be one) that intersects with possible movements
+    #     without rotation with the outer ring
+    #     """
+    #     # list of coordinates
+    #     ar_class = self.maze.get_animal_robot_class()
+    #     animal_movement_choices = self.maze.get_outer_ring_coordinates(ar_class.position_vector)
+    #     # return intersection of lists
+    #     self_movement_choices = self.move_no_rotation()
+    #     print(f'The AR {ar_class.name}, is in position {ar_class.position_vector} has choices',
+    #           animal_movement_choices)
+    #     print(f'The NAR {self.name}, is in position {self.position_vector} has choices',
+    #           self_movement_choices)
+    #
+    #     # get common element (ie the option that is available for the robot to move to
+    #     common_element = common_elements(animal_movement_choices, self_movement_choices)
+    #     # assign this as the new position vector
+    #     print('COMMON ELEMENT', common_element)
+    #     self.position_vector = common_element[0]
+    #     return self.position_vector
+
     def move_to_animal_outer_ring(self):
         """
         Method for the NAR robot
@@ -360,11 +384,21 @@ class PlatformRobot:
         without rotation with the outer ring
         """
         # list of coordinates
-        animal_robot_class = self.maze.get_animal_robot_class()
-        animal_movement_choices = self.maze.get_outer_ring_coordinates(animal_robot_class.position_vector)
+        ar_class = self.maze.get_animal_robot_class()
+        self.move_to_robot_outer_ring(ar_class)
+
+    def move_to_robot_outer_ring(self, stationary_robot):
+        """
+        ---
+        :return position_vector: the value (should only be one) that intersects with possible movements
+        without rotation with the outer ring
+        """
+        # list of coordinates
+
+        animal_movement_choices = self.maze.get_outer_ring_coordinates(stationary_robot.position_vector)
         # return intersection of lists
         self_movement_choices = self.move_no_rotation()
-        print(f'The AR {animal_robot_class.name}, is in position {animal_robot_class.position_vector} has choices',
+        print(f'The AR {stationary_robot.name}, is in position {stationary_robot.position_vector} has choices',
               animal_movement_choices)
         print(f'The NAR {self.name}, is in position {self.position_vector} has choices',
               self_movement_choices)

@@ -12,11 +12,11 @@ logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
 hm = HexagonMaze(column_number=13, row_number=15)
 # Instantiate robots
 execute = False
-robot1 = (3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
+robot1 = PlatformRobot(3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
 robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
 robot3 = PlatformRobot(3, 4, -7, 4, '192.168.0.106', execute, 'robot3')
 
-robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
+# robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -26,10 +26,9 @@ robot1.set_maze(hm)
 robot2.set_maze(hm)
 robot3.set_maze(hm)
 
+mouse.set_maze(hm)
 # Set initial animal robot - this should be automated
 robot1.set_animal_robot(True)
-
-mouse.set_maze(hm)
 
 
 def functional_main(execute=True, manual=False):
@@ -129,11 +128,12 @@ def test_2():
     # robot1.ssh_connect(True, '192.168.0.101')
     print(robot1.position_vector)
     print(robot1.direction)
-    command = robot1.make_command_list([(3, 4, -7), (4,5,-9), (5,4,-9), (5,3,-9), (5,2,-7), (4,2,-6), (3,2,-5), (2,3,-5)
+    command = robot1.make_command_list(
+        [(3, 4, -7), (4, 5, -9), (5, 4, -9), (5, 3, -9), (5, 2, -7), (4, 2, -6), (3, 2, -5), (2, 3, -5)
 
-                                        # (2,5,-7), (3, 5, -8), (2,6,-8), (3, 5, -8)
-                                        ]
-                                       )
+         # (2,5,-7), (3, 5, -8), (2,6,-8), (3, 5, -8)
+         ]
+        )
     command_string = ' '.join(map(str, command))
     print(command_string)
     # robot1.execute_command(command_string)
@@ -141,13 +141,13 @@ def test_2():
     print(robot1.direction)
     pass
 
+
 def test_3():
     print(robot4.position_vector)
     robot4.change_position('y', -1)
     print(robot4.position_vector)
 
     pass
-
 
 
 def run_program(run_no):
