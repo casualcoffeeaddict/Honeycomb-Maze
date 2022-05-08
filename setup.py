@@ -1,9 +1,10 @@
 import setuptools
 
+
 setuptools.setup(
       # package metadata
       name='honeycomb_maze',
-      version='0.1.0',
+      version='0.1.01',
       description='Python Implementation of Honeycomb Maze',
       long_description='To be filled in',
       long_description_content_type="text/markdown",
@@ -21,6 +22,6 @@ setuptools.setup(
       # declare dependencies here:
       # find dependencies on PyPI - default install location: https://pypi.org
       install_requires=[
-      'markdown', 'networkx', 'random', 'logging', 'paramiko'
+      'markdown', 'networkx', 'logging', 'paramiko'
       ],
 )
