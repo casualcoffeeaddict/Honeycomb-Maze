@@ -30,6 +30,7 @@ mouse.set_maze(hm)
 # Set initial animal robot - this should be automated
 robot1.set_animal_robot(True)
 
+hm.save_network_image()
 
 def functional_main(execute=True, manual=False):
     hm.get_status()
@@ -160,7 +161,7 @@ def run_program(run_no):
 
 
 if __name__ == '__main__':
-    run_program(1)
+    # run_program(1)
     # test()
     # test_2(robot1)
     # test_3()

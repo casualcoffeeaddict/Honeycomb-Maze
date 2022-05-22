@@ -2,6 +2,7 @@
 import logging
 import random
 import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class HexagonGrid:
@@ -195,6 +196,28 @@ class HexagonMaze(HexagonGrid):
         Sets the network of points (in networkx) for which the robots can move around in
         """
         self.movement_network = self.generate_network(self.rows, self.columns)
+
+    def save_network_image(self, x_dim=None, y_dim=None, RHS=True):
+        """
+        Makes an image of the network (using matplotlib.pyplot) and saves it to honeycomb_maze/images
+        :return: image in honeycomb_maze/images
+        """
+        # set size of figure in the same ratio (and size) as the number of rows and columns in maze
+        if x_dim == None:
+            x_dim= self.rows
+        if y_dim == None:
+            y_dim=self.columns
+        # set fig size
+        plt.rcParams["figure.figsize"] = (x_dim, y_dim)
+        # draw image in plt
+        G = self.movement_network
+        nx.draw_spectral(G, with_labels=True)
+        # reflect graph so relative position is clockwise not anticlockwise
+        if RHS != True:
+            plt.gca().invert_yaxis()
+        # save file to images
+        plt.title('MOVEMENT_NETWORK')
+        plt.savefig('images/MOVEMENT_NETWORK.png')
 
     def get_animal_robot_class(self):
         """
