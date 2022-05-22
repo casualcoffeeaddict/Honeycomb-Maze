@@ -1,11 +1,11 @@
 # imports
-from animal import *
-from maze import *
-from robot import *
-from static_methods import *
+from honeycomb_maze.animal import *
+from honeycomb_maze.maze import *
+from honeycomb_maze.robot import *
+from honeycomb_maze.static_methods import *
 
 # Start Logging
-logging.basicConfig(filename='logs/maze.log', encoding='utf-8')
+# logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
@@ -16,7 +16,7 @@ robot1 = PlatformRobot(3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
 robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
 robot3 = PlatformRobot(3, 4, -7, 4, '192.168.0.106', execute, 'robot3')
 
-# robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
+robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -124,11 +124,11 @@ def test():
     pass
 
 
-def test_2():
+def test_2(robot):
     # robot1.ssh_connect(True, '192.168.0.101')
-    print(robot1.position_vector)
-    print(robot1.direction)
-    command = robot1.make_command_list(
+    print(robot.position_vector)
+    print(robot.direction)
+    command = robot.make_command_list(
         [(3, 4, -7), (4, 5, -9), (5, 4, -9), (5, 3, -9), (5, 2, -7), (4, 2, -6), (3, 2, -5), (2, 3, -5)
 
          # (2,5,-7), (3, 5, -8), (2,6,-8), (3, 5, -8)
@@ -137,8 +137,8 @@ def test_2():
     command_string = ' '.join(map(str, command))
     print(command_string)
     # robot1.execute_command(command_string)
-    print(robot1.position_vector)
-    print(robot1.direction)
+    print(robot.position_vector)
+    print(robot.direction)
     pass
 
 
@@ -160,8 +160,8 @@ def run_program(run_no):
 
 
 if __name__ == '__main__':
-    # run_program(1)
+    run_program(1)
     # test()
-    test_2()
+    # test_2(robot1)
     # test_3()
     pass

@@ -3,7 +3,7 @@ import logging
 import random
 import paramiko
 
-from static_methods import *
+from honeycomb_maze.static_methods import *
 
 
 class PlatformRobot:
@@ -489,7 +489,6 @@ class PlatformRobot:
             modulus = 6
         elif clockwise == False:
             modulus = -6
-
 
         # from self.direction, return the number of turns required to get the correct direction
         direction_difference = self.path_relative_position(move, self.position_vector) - self.direction
