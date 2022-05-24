@@ -51,7 +51,7 @@ class HexagonMaze(HexagonGrid):
 
     def get_status(self):
         """Prints the status of the maze (the position of the animal, robots, maze and goal) for debugging"""
-        direction_to_axis = {0: 'y', 1: 'z', 2: 'x', 3: 'y', 4: 'z', 5: 'x'}
+        direction_to_axis = {0: '+y', 1: '+z', 2: '-x', 3: '-y', 4: '-z', 5: '+z'}
         print('\n \n======== STATUS OF THE MAZE ========')
         print(f'Maze goal is: {self.goal}')
         print('Position of Robots:')
@@ -197,16 +197,16 @@ class HexagonMaze(HexagonGrid):
         """
         self.movement_network = self.generate_network(self.rows, self.columns)
 
-    def save_network_image(self, x_dim=None, y_dim=None, RHS=True):
+    def save_network_image(self, x_dim=None, y_dim=None, RHS=True, directory='images/MOVEMENT_NETWORK.png'):
         """
         Makes an image of the network (using matplotlib.pyplot) and saves it to honeycomb_maze/images
-        :return: image in honeycomb_maze/images
+        :return: image in directory
         """
         # set size of figure in the same ratio (and size) as the number of rows and columns in maze
         if x_dim == None:
-            x_dim= self.rows
+            x_dim = self.rows
         if y_dim == None:
-            y_dim=self.columns
+            y_dim = self.columns
         # set fig size
         plt.rcParams["figure.figsize"] = (x_dim, y_dim)
         # draw image in plt
@@ -217,7 +217,7 @@ class HexagonMaze(HexagonGrid):
             plt.gca().invert_yaxis()
         # save file to images
         plt.title('MOVEMENT_NETWORK')
-        plt.savefig('images/MOVEMENT_NETWORK.png')
+        plt.savefig(directory)
 
     def get_animal_robot_class(self):
         """
@@ -226,9 +226,6 @@ class HexagonMaze(HexagonGrid):
         for robot in self.robot_list:
             if robot.is_animal_robot == 'AR':
                 return robot
-            # else:
-            #     print('ERROR: There is no animal robot in the maze')
-            #     logging.error('ERROR: there is no animal robot in the maze')
 
     def get_non_animal_robot_class(self):
         """
@@ -264,10 +261,10 @@ class HexagonMaze(HexagonGrid):
         print(f' position vector', position_vector)
         logging.info(f' position vector', position_vector)
         x, y, z = list(position_vector)
-        for i in range(len(inner_ring)):
-            change_x = inner_ring[i][0]
-            change_y = inner_ring[i][1]
-            change_z = inner_ring[i][2]
+        for index in range(len(inner_ring)):
+            change_x = inner_ring[index][0]
+            change_y = inner_ring[index][1]
+            change_z = inner_ring[index][2]
 
             consecutive_coordinate_list.append([x + change_x, y + change_y, z + change_z])
 
@@ -287,10 +284,10 @@ class HexagonMaze(HexagonGrid):
                       [0, 2, -2], [1, 1, -2]]
         outer_ring_coordinates = []
         x, y, z = position_vector
-        for i in range(len(outer_ring)):
-            change_x = outer_ring[i][0]
-            change_y = outer_ring[i][1]
-            change_z = outer_ring[i][2]
+        for index in range(len(outer_ring)):
+            change_x = outer_ring[index][0]
+            change_y = outer_ring[index][1]
+            change_z = outer_ring[index][2]
 
             outer_ring_coordinates.append([x + change_x, y + change_y, z + change_z])
 
@@ -311,8 +308,6 @@ class HexagonMaze(HexagonGrid):
         for robot in self.robot_list:
             if robot != moving_robot_class:
                 robot_position_list.append(robot.position_vector)
-            else:
-                pass
 
         # Non-moving robot position list
         consecutive_position_list = []
@@ -352,6 +347,7 @@ class HexagonMaze(HexagonGrid):
 
         def remove_consecutive_positions(temp_movement_network, consecutive_positions):
             """Remove the positions that are consecutive to the robots and update self.temp_movement_network"""
+            print('Removing Nodes from Networks')
             print('No of nodes of temp network', len(temp_movement_network.nodes))
             print(len(consecutive_positions))
             for position in consecutive_positions:
@@ -362,7 +358,7 @@ class HexagonMaze(HexagonGrid):
             print('The positions consecutive to any other robot have been removed from the temp_movement_network')
             logging.info(
                 'The positions consecutive to any other robot have been removed from the temp_movement_network')
-            print('No of nodes of temp network', len(temp_movement_network.nodes))
+            print('Nodes have been removed. \nNo of nodes of temp network', len(temp_movement_network.nodes))
             return temp_movement_network
 
         def add_edge_to_outer_ring(self, temp_movement_network):
@@ -402,13 +398,22 @@ class HexagonMaze(HexagonGrid):
         # get inner ring positions of stationary robots
         consecutive_positions = self.get_consecutive_positions(moving_robot_class)
         # add positions of non-moving robot classes
-
+        non_moving_robot_positions = []
+        for robot in self.robot_list:
+            if robot != moving_robot_class:
+                non_moving_robot_positions.append(robot.position_vector)
         # make list of edges between nodes in (inner ring + AR.position_vector) then remove duplicates)
-
+        edge_list = []
         # remove these edges from the network
+        print('Removing Edges from network. \nNo of edges:',len(self.temp_movement_network.edges()))
+        for edge in edge_list:
+            self.temp_movement_network.remove_edge(edge)
+        print('Edges Removed from network. \nNo of edges:', len(self.temp_movement_network.edges()))
+        # set the source and target of the movement network
 
         # find the shortest path
-        pass
+        # return nx.shortest_path(self.temp_movement_network, source=source, target=target)
+
 
     def pathfinder(self, moving_robot_class):
         """
@@ -430,7 +435,7 @@ class HexagonMaze(HexagonGrid):
         temp_movement_network = self.make_temp_movement_network(moving_robot_class)
 
         logging.debug('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
-        print('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
+        print(f'The {moving_robot_class.name} Pathfinding', '\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
 
         return nx.shortest_path(temp_movement_network, source=tuple(source), target=tuple(target))
 
@@ -443,11 +448,11 @@ class HexagonMaze(HexagonGrid):
         # the shortest path
 
         """
-                Get a target position vector which is valid in the following ways:
-                1. It must not be the current position of a robot
-                2. It must be in the outer ring and a valid relative position
-                3. It must not be in the current pathfinding target position of the other non animal robot
-                """
+        Get a target position vector which is valid in the following ways:
+        1. It must not be the current position of a robot
+        2. It must be in the outer ring and a valid relative position
+        3. It must not be in the current pathfinding target position of the other non animal robot
+        """
         animal_robot = self.get_animal_robot_class()
         choices = self.get_inner_ring_coordinates(animal_robot.position_vector)
         # 1. It must not be the current position of a robot

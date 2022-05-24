@@ -4,7 +4,7 @@ from honeycomb_maze.maze import *
 from honeycomb_maze.robot import *
 
 # Start Logging
-logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
+# logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
 
 # INSTANTIATE OBJECTS
 # Instantiate maze
@@ -40,6 +40,12 @@ def main():
     # print(robot1.direction)
     pass
 
+def test():
+    robot1.is_animal_robot = 'NAR'
+    print(robot2.position_vector, robot2.direction)
+    robot2.step_back_from_NAR(False)
+    print(robot2.position_vector, robot2.direction)
+
 
 if __name__ == "__main__":
-    main()
+    test()

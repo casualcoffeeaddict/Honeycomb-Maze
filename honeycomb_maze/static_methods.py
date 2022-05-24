@@ -9,7 +9,7 @@ def pause(bool = True):
     :return: Will pause the code
     """
     if bool:
-        pause = input('Would you like to continue?')
+        pause = input('\n==Would you like to continue?==\n')
     else:
         pass
 

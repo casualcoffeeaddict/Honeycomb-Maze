@@ -24,6 +24,7 @@ setuptools.setup(
       install_requires=[
             'networkx',
             'logging',
-            'paramiko'
+            'paramiko',
+            'matplotlib'
       ],
 )

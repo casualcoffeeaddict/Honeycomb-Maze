@@ -2,7 +2,6 @@
 from honeycomb_maze.animal import *
 from honeycomb_maze.maze import *
 from honeycomb_maze.robot import *
-from honeycomb_maze.static_methods import *
 
 # Start Logging
 # logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
@@ -14,9 +13,9 @@ hm = HexagonMaze(column_number=13, row_number=15)
 execute = False
 robot1 = PlatformRobot(3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
 robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
-robot3 = PlatformRobot(3, 4, -7, 4, '192.168.0.106', execute, 'robot3')
+robot3 = PlatformRobot(3, 4, -7, 5, '192.168.0.106', execute, 'robot3')
 
-robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
+# robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -31,8 +30,9 @@ mouse.set_maze(hm)
 robot1.set_animal_robot(True)
 
 hm.save_network_image()
+mouse.set_animal_position()
 
-def functional_main(execute=True, manual=False):
+def functional_main(execute=False, manual=False):
     hm.get_status()
     print('MOUSE CHOICE')
     # changes which animal is the correct animal class
@@ -41,7 +41,7 @@ def functional_main(execute=True, manual=False):
     # print(hm.get_animal_robot_class() == animal_choice_class)
     mouse.change_animal_class(animal_choice_class)  # animal moves to its choice
 
-    hm.get_status()
+    # hm.get_status()
 
     # set the animal position
     mouse.set_animal_position()  # change the position of the animal based on its movement
@@ -54,14 +54,17 @@ def functional_main(execute=True, manual=False):
     print('GET THE CLASSES OF THE NON ANIMAL ROBOTS')
     nnar = hm.get_non_non_animal_robot_class()
     nar = hm.get_non_animal_robot_class()
-    # print(nnar.name)
+    print('nnar.name:', nnar.name)
+    print('nar.name:', nar.name)
     # SETTING PATHFINDING TARGETS
-    nnar.set_pathfinding_target_position(
-        manual)  # pathfinding position must not be the pathfinding position of the other robot.
+    nnar.set_pathfinding_target_position(manual)
+    # pathfinding position must not be the pathfinding position of the other robot.
     print('\n\nnnar target position', nnar.target_position)
+    print(nnar.pathfinding_target_position)
 
     nar.set_pathfinding_target_position(manual)
     print('\n\nnar target position', nar.target_position)
+    print(nar.pathfinding_target_position)
 
     hm.get_status()
     pause()
@@ -114,6 +117,15 @@ def functional_main(execute=True, manual=False):
     # print(mouse.animal_path)  # return the path of the animal
 
 
+def run_program(run_no):
+    run = 1
+    while run <= run_no:
+        print(f"START OF RUN {run}")
+        functional_main()
+        print(f"END OF RUN {run}")
+        run = run + 1
+
+
 def test():
     robot2.is_animal_robot = 'NAR'
     robot3.is_animal_robot = 'NNAR'
@@ -134,7 +146,7 @@ def test_2(robot):
 
          # (2,5,-7), (3, 5, -8), (2,6,-8), (3, 5, -8)
          ]
-        )
+    )
     command_string = ' '.join(map(str, command))
     print(command_string)
     # robot1.execute_command(command_string)
@@ -144,24 +156,16 @@ def test_2(robot):
 
 
 def test_3():
-    print(robot4.position_vector)
-    robot4.change_position('y', -1)
-    print(robot4.position_vector)
+    robot1.is_animal_robot = 'NAR'
+    print('Start', robot2.position_vector)
+    robot2.step_back_from_NAR(False)
+    print('End', robot2.position_vector)
 
     pass
 
 
-def run_program(run_no):
-    run = 1
-    while run <= run_no:
-        print(f"START OF RUN {run}")
-        functional_main()
-        print(f"END OF RUN {run}")
-        run = run + 1
-
-
 if __name__ == '__main__':
-    # run_program(1)
+    run_program(1)
     # test()
     # test_2(robot1)
     # test_3()
