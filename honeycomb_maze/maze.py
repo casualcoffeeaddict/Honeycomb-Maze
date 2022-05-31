@@ -386,36 +386,102 @@ class HexagonMaze(HexagonGrid):
 
         return temp_movement_network
 
-    def make_circular_movement_network(self, moving_robot_class):
+    def make_temp_movement_network_circular(self, moving_robot_class):
         """
         Pathfinding function for circular robot platforms not hexagonal platforms
         ---
         :param moving_robot_class: the class of the robot that is going to move in the next move
         :return temp_movement_network: The movement network that is required for the pathfinding of the
         """
+
+        def consecutive_positions(node):
+            # generate consecutive positions
+            inner_ring_vectors = [(1, 0, -1), (1, -1, 0), (0, -1, 1), (-1, 0, 1), (-1, 1, 0),
+                                  (0, 1, -1)]  # consecutive vectors
+            inner_ring_nodes = []
+            for inner_ring_vector in inner_ring_vectors:
+                # add each vector to the node
+                # print(node, inner_ring_vector)
+                consecutive_node = [
+                    a_i + b_i for a_i, b_i in zip(node, inner_ring_vector)]
+                # print(consecutive_node)
+                # add it to the list
+
+                inner_ring_nodes.append(tuple(consecutive_node))
+
+            return inner_ring_nodes
+
+        def remove_duplicates(coordinate_list):
+            new_coordinate_list = []
+            for elem in coordinate_list:
+                if elem not in new_coordinate_list:
+                    new_coordinate_list.append(elem)
+            return new_coordinate_list
+
+        def order_items(coordinate_list):
+            new_coordinate_list = []
+            for edge in coordinate_list:
+                if edge[0][0] > edge[1][0]:
+                    # do nothing
+                    continue
+                elif edge[1][0] > edge[0][0]:
+                    # swap the positions of the items
+                    edge[0], edge[1] = edge[1], edge[0]
+            return new_coordinate_list
+
+        def tuple_to_list(coordinate_list):
+            new_coordinate_list =[]
+
+            for edge in coordinate_list:
+                new_edge = []
+                for node in edge:
+                    node = list(node)
+                    new_edge.append(node)
+                    new_coordinate_list.append(new_edge)
+            return new_coordinate_list
+
         # make copy of movement network
         self.temp_movement_network = self.movement_network.copy()
         # get inner ring positions of stationary robots
-        consecutive_positions = self.get_consecutive_positions(moving_robot_class)
+        node_positions = self.get_consecutive_positions(moving_robot_class)
         # add positions of non-moving robot classes
-        non_moving_robot_positions = []
         for robot in self.robot_list:
             if robot != moving_robot_class:
-                non_moving_robot_positions.append(robot.position_vector)
+                node_positions.append(tuple(robot.position_vector))
+
         # make list of edges between nodes in (inner ring + AR.position_vector) then remove duplicates)
         edge_list = []
+
+        for node in node_positions:
+            # find the consecutive position of this node
+            node_consec_positions = consecutive_positions(node)
+            for node_consec in node_consec_positions:
+                if node_consec in node_positions:
+                    edge = (node, node_consec) # formatting for the edge
+                    edge_list.append(edge)
+
+
+        print(len(edge_list))
+        edge_list = tuple_to_list(edge_list)
+        print(len(edge_list))
+        edge_list = remove_duplicates(edge_list)
+        edge_list = order_items(edge_list)
+        print(edge_list)
+        # edge_list.sort()
+        # print(edge_list)
+
         # remove these edges from the network
-        print('Removing Edges from network. \nNo of edges:',len(self.temp_movement_network.edges()))
-        for edge in edge_list:
-            self.temp_movement_network.remove_edge(edge)
-        print('Edges Removed from network. \nNo of edges:', len(self.temp_movement_network.edges()))
+        # print('Removing Edges from network. \nNo of edges:',len(self.temp_movement_network.edges()))
+        # for edge in edge_list:
+        #     self.temp_movement_network.remove_edge(edge)
+        # print('Edges Removed from network. \nNo of edges:', len(self.temp_movement_network.edges()))
         # set the source and target of the movement network
 
         # find the shortest path
         # return nx.shortest_path(self.temp_movement_network, source=source, target=target)
 
 
-    def pathfinder(self, moving_robot_class):
+    def pathfinder(self, moving_robot_class, platform_type = 'HEX'):
         """
         Get the list of movements from the pathfinding start to the pathfinding end (using dijkstra pathfinding
         algorithm
@@ -431,8 +497,10 @@ class HexagonMaze(HexagonGrid):
         # getting the pathfinding target and start
         source = moving_robot_class.position_vector
         target = moving_robot_class.pathfinding_target_position
-
-        temp_movement_network = self.make_temp_movement_network(moving_robot_class)
+        if platform_type == 'HEX':
+            temp_movement_network = self.make_temp_movement_network(moving_robot_class)
+        elif platform_type == 'CIR':
+            temp_movement_network = self.make_temp_movement_network_circular(moving_robot_class)
 
         logging.debug('\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))
         print(f'The {moving_robot_class.name} Pathfinding', '\nPathfinding Source:', tuple(source), '\nPathfinding Target:', tuple(target))

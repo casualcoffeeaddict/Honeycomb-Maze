@@ -2,6 +2,7 @@
 import logging
 import random
 import paramiko
+import time
 
 from honeycomb_maze.static_methods import *
 
@@ -72,21 +73,7 @@ class PlatformRobot:
         x = self.position_vector[0]
         y = self.position_vector[1]
         z = self.position_vector[2]
-        if axis == 'x':
-            y += step
-            z -= step
-            return [x, y, z]
-        elif axis == 'y':
-            x += step
-            z -= step
-            return [x, y, z]
-        elif axis == 'z':
-            x += step
-            y -= step
-            return [x, y, z]
-        else:
-            print('ERROR: Select correct dimension, either x, y, z')
-            logging.error('Select correct dimension, either x, y, z')
+        return self.movement(axis, step, x, y, z)
 
     def change_position(self, axis, step):
         """
@@ -95,21 +82,34 @@ class PlatformRobot:
         x = self.position_vector[0]
         y = self.position_vector[1]
         z = self.position_vector[2]
+        self.position_vector = self.movement(axis, step, x, y, z)
+        return self.position_vector
+
+    @staticmethod
+    def movement(axis, step, x, y, z):
+        """
+        :param axis: axis (as a letter) for the direction of movement
+        :param step: the number of steps taken in this direction
+        :param x: x-coord
+        :param y: y-coord
+        :param z: z-coord
+        :return position_vector:  the new position_vector of this movement
+        """
         if axis == 'x':
             y += step
             z -= step
-            self.position_vector = [x, y, z]
-            return self.position_vector
+            position_vector = [x, y, z]
+            return position_vector
         elif axis == 'y':
             x = x + step
             z -= step
-            self.position_vector = [x, y, z]
-            return self.position_vector
+            position_vector = [x, y, z]
+            return position_vector
         elif axis == 'z':
             x += step
             y -= step
-            self.position_vector = [x, y, z]
-            return self.position_vector
+            position_vector = [x, y, z]
+            return position_vector
         else:
             print('ERROR: Select correct dimension, either x, y, z')
             logging.error('Select correct dimension, either x, y, z')
@@ -145,7 +145,6 @@ class PlatformRobot:
             logging.info(f'The robot {self.name} is off axis (its position is invalid because it is off axis),'
                          f' or robot is at origin.')
 
-
     def move_no_rotation(self):
         """
         For the robot self, this function will return the position vectors of the movements
@@ -164,11 +163,24 @@ class PlatformRobot:
 
         return movement_choices
 
+    def get_step_back(self):
+        """
+
+        ---
+        :param robot_class: class of the robot that is moving back
+        :return: position_vector of the robot once it has stepped back one step
+        """
+        direction = self.direction
+        direction_axis = self.direction_to_axis[direction]
+        return self.get_relative_position(direction_axis, -1)  # return the position of one step back from the robot
+
     def get_target_position(self, manual=False):
         """
+        Least well design part of the code. Requires a better implementation
+        ---
         Get a target position vector which is valid in the following ways:
         1. It must not be the current position of a robot
-        2. It must be in the outer ring and a valid relative position
+        2. It must be in the outer ring of the AR and a valid relative position
         3. It must not be in the current pathfinding target position of the other non animal robot
         4. The pathfinding_target for NNAR must not be in the inner ring of the NAR
         """
@@ -185,8 +197,7 @@ class PlatformRobot:
                 print('INFO: Robot position vector not inside choice of target positions')
                 logging.info('INFO: Robot position vector not inside choice of target positions')
 
-            # remove the position of the other robot's target position
-
+            # 3. remove the position of the other robot's target position
             if robot.target_position != None:
                 if list(robot.target_position) in choices:
                     choices.remove(list(robot.target_position))
@@ -194,19 +205,17 @@ class PlatformRobot:
                     print(
                         f"INFO: The robot,{robot.name}'s target position was not in the list of choices. It was {robot.target_position}")
 
-        # 4. The pathfinding_target for NNAR must not be in the inner ring of the NAR
-        if self.is_animal_robot == 'NNAR':
-            # if NAR robot.direction is inline with AR no need to remove anything from the choice list
-            # if self.maze.get_non_animal_robot_class.direction != animal_robot.direction:
-            inner_ring_nar = non_animal_robot.get_inner_ring_position() # make list of adjacent positions
-            for position in inner_ring_nar:
-                if position in choices:
-                    choices.remove(position)
-            # else:
-            robot.is_animal_robot == 'NAR'
-            # get the inner ring of NAR
-
-
+        # 4. The pathfinding_target for NNAR must not be in the inner ring of the NAR after it steps back
+        # if the robot which is selecting a target is the NNAR
+        # if self.is_animal_robot == 'NNAR':
+        #     # get the position of the NAR once it steps back
+        #     nar_step_back_position = non_animal_robot.get_step_back()
+        #     # get in the inner ring of that position
+        #     inner_ring_list_nar = self.inner_ring_positions(nar_step_back_position)
+        #     # remove any of the positions in this list from the choices list
+        #     for position in inner_ring_list_nar:
+        #         if position in choices:
+        #             choices.remove(position)
 
         print(choices)
         logging.info(choices)
@@ -216,17 +225,22 @@ class PlatformRobot:
         if manual == False:
             return tuple(random.choice(choices))
         elif manual == True:
-            index = int(input('What is the index of the position you would like to choose from this list?'))
+            while True:
+                try:
+                    index = int(input('What is the index of the position you would like to choose from this list?'))
+                    break
+                except ValueError:
+                    print(f'Please input an integer in the range {len(choices)}')
             return choices[index - 1]
 
-    def set_pathfinding_source_position(self):
-
-        # get the source position
-        source_position = self.position_vector
-        # get the pathfinding source position
-        source_rel_position = self.animal_relative_position(source_position)
-        move = self.rel_inner_ring[source_rel_position]
-        source_target_position = [a_i + n_i for a_i, n_i in zip(source_position, move)]
+    # def set_pathfinding_source_position(self):
+    #
+    #     # get the source position
+    #     source_position = self.position_vector
+    #     # get the pathfinding source position
+    #     source_rel_position = self.animal_relative_position(source_position)
+    #     move = self.rel_inner_ring[source_rel_position]
+    #     source_target_position = [a_i + n_i for a_i, n_i in zip(source_position, move)]
 
     def set_pathfinding_target_position(self, manual=False):
         """Based on the target position, the pathfinding target position also has to be set
@@ -321,17 +335,26 @@ class PlatformRobot:
         """Get the direction of the robot (from 0 to 5)"""
         pass
 
+    def inner_ring_positions(self, position_vector):
+
+        inner_ring = []
+        for coord in self.rel_inner_ring:
+            consecutive_position = [a_i + b_i for a_i, b_i in zip(coord, position_vector)]
+            inner_ring.append(consecutive_position)
+        return inner_ring
+
     def get_inner_ring_position(self):
         """
         Get the positions that are in the inner ring of the robot's current position
         ---
         :return inner_ring: list of adjacent positions of the robot
         """
-        inner_ring = []
-        for coord in self.rel_inner_ring:
-            consecutive_position = [a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
-            inner_ring.append(consecutive_position)
-        return inner_ring
+        # inner_ring = []
+        # for coord in self.rel_inner_ring:
+        #     consecutive_position = [a_i + b_i for a_i, b_i in zip(coord, self.position_vector)]
+        #     inner_ring.append(consecutive_position)
+        # return inner_ring
+        return self.inner_ring_positions(self.position_vector)
 
     def get_outer_ring_position(self):
         """Get the positions that are in the inner ring of the robot's current position"""
@@ -383,6 +406,7 @@ class PlatformRobot:
         self.direction = (self.direction + 3) % 6
 
         # send commands to ssh to do this
+        print('Turn around command:', [1, 1])
         if execute == True:
             self.execute_command('1, 1')
 
@@ -459,6 +483,7 @@ class PlatformRobot:
 
         if execute == True:
             self.execute_command('1, 1')
+            time.sleep(11)
 
     def move_to_animal_outer_ring(self, execute=True):
         """
@@ -474,6 +499,8 @@ class PlatformRobot:
         # Due to line_follow_robot11, flip the direction of the robot
         self.direction = (self.direction + 3) % 6
 
+        # send SSH Command to turn around
+        print('Turn around command:', [1, 1])
         if execute == True:
             self.execute_command('1, 1')
 
@@ -571,7 +598,7 @@ class PlatformRobot:
             modulus = -6
 
         # starting command
-        command_list = [0, 0]
+        command_list = []
         for move in path_list[1:]:  # starts at second entry in list as the first entry is the
             # print(self.direction, self.path_relative_position(move, self.position_vector))
             # Handle turns
@@ -609,6 +636,39 @@ class PlatformRobot:
                 # update position
                 self.position_vector = list(move)
 
+        return [0, 0] + self.remove_zeros(command_list)
+
+    @staticmethod
+    def remove_zeros(command_list):
+        """
+        remove the '0 1' entries from the list and replace them with '2' in the correct place
+        ---
+        :param command_list:
+        :return command_list: without '0 1' in the command list
+        """
+        flag = True
+        while flag == True:
+            length_of_list = len(command_list) - 1
+            # print('length_of_list', length_of_list)
+            for index in range(length_of_list):
+                # print('length', length_of_list)
+                # print('index:', index)
+                # if index > 1:
+                # print('command',command_list[index])
+                if command_list[index] == 0:
+                    # update the value (to 2)
+                    command_list[index - 1] = command_list[index - 1] + command_list[index + 1]
+                    # remove the 0 1 from the list
+                    command_list.pop(index)
+                    length_of_list = length_of_list - 1
+                    command_list.pop(index)
+                    length_of_list = length_of_list - 1
+                    # print('length_of_list', length_of_list)
+                    # print(command_list)
+                    break
+                elif command_list.count(0) == 0:
+                    # stop the loop at this point
+                    flag = False
         return command_list
 
     def set_command_list(self):
@@ -621,7 +681,7 @@ class PlatformRobot:
         # set the path list
         self.command_list = command_list
 
-    # Methods for SSH
+    # Methods for Secure Shell (SSH)
 
     def ssh_connect(self, execute, ip_address, username='root', password=''):
         """
@@ -640,7 +700,7 @@ class PlatformRobot:
                              pkey=None, key_filename=None, timeout=None, allow_agent=True,
                              look_for_keys=True, compress=False)
 
-    def execute_command_list(self, execute):
+    def execute_command_list(self, execute, sim=False):
         """
         Before this command is run, the command list must by the self.ssh_connect() command which is done in the
         __init__ function
@@ -655,16 +715,63 @@ class PlatformRobot:
                 # make list into string of numbers
                 command_string = ' '.join(map(str, self.command_list))
                 # send command
-                self.execute_command(command_string)
+                self.execute_command(command_string, sim)
                 # to prevent commands being executed twice, clear the command list
                 self.command_list = None
                 # reset the target position
                 self.target_position = None
 
-    def execute_command(self, command_string):
+    def execute_command(self, command_string, sim=False):
         # send command
-        stdin, stdout, sterr = self.ssh.exec_command(f'./lineFollowJunction11 {command_string}')
-        print(f'./lineFollowJunction11 {command_string}')
+        complete_command = f'./lineFollowJunction11 {command_string}'
+        stdin, stdout, sterr = self.ssh.exec_command(complete_command)
+        print(complete_command)
+
+        # Timing
+        run_time = self.get_run_time(command_string)
+        if sim == True:
+            # skip timing
+            pass
+        elif sim == False:
+            print(f'Waiting {run_time} seconds')
+            time.sleep(run_time)
+            print('Waiting Complete')
+
+    def get_run_time(self, command_string):
+        """
+        get the time required to execute the command
+        :return run_time: the time requires to complete the command string
+        """
+
+        time_per_turn = 2
+        time_per_step = 3.5
+        time_per_half_turn_around = 4
+
+        turn_around = []
+
+        step_list = []
+        turn_list = []
+        index = 0
+        for command in command_string[::2]:
+            # turn around or not at the start
+            if index <= 1:
+                if command == '1':
+                    turn_around.append(1)  # time taken for the turn around to take place
+                if command == '0':
+                    turn_around.append(0)
+
+            # odd numbers
+            if index % 2 == 1 and index > 1:
+                step_list.append(int(command))
+            # even numbers
+            if index % 2 == 0 and index > 1:
+                turn_list.append(int(command))
+
+            index += 1
+
+        run_time = sum(step_list) * time_per_step + sum(turn_list) * time_per_turn + sum(
+            turn_around) * time_per_half_turn_around
+        return run_time
 
     def coordinate_callibration(self, position_vector):
         """

@@ -14,10 +14,10 @@ logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
 # Instantiate maze
 hm = HexagonMaze(column_number=13, row_number=15)
 # Instantiate robots
-execute = False
-robot1 = PlatformRobot(7, 3, -10, 2, '192.168.0.101', execute, 'robot1')
+execute = True
+robot1 = PlatformRobot(7, 3, -10, 3, '192.168.0.101', execute, 'robot1')
 robot2 = PlatformRobot(6, 3, -9, 0, '192.168.0.103', execute, 'robot2')
-robot3 = PlatformRobot(6, 4, -10, 1, '192.168.0.106', execute, 'robot3')
+robot3 = PlatformRobot(6, 4, -10, 2, '192.168.0.106', execute, 'robot3')
 
 # Instantiate animal with its maze
 mouse = Animal(hm, 'mouse')
@@ -34,7 +34,7 @@ robot2.set_animal_robot(True)
 mouse.set_animal_position()
 
 
-def functional_main(execute=False, manual=False):
+def functional_main(execute=execute, manual=True):
     # Starting Status of the Maze
     hm.get_status()
     # Animal Makes Movement Choice
@@ -46,20 +46,23 @@ def functional_main(execute=False, manual=False):
     hm.get_status()
     pause()
 
-    # Method for setting target and parhfinding targets for the robots
+    # Method for setting target and pathfinding targets for the robots
     nnar = hm.get_non_non_animal_robot_class()
     nar = hm.get_non_animal_robot_class()
 
     # Set the Pathfinding Targets
     nnar.set_pathfinding_target_position(manual)
-
     nar.set_pathfinding_target_position(manual)
+    print(f'Pathfinding Targets:'
+          f' \nnnar: {nnar.name}, {nnar.target_position}, {nnar.pathfinding_target_position}',
+          f'\nnar: {nar.name}, {nar.target_position}, {nar.pathfinding_target_position}')
 
     hm.get_status()
     pause()
 
     # NNAR step back from NAR
     nnar.move_to_animal_outer_ring(execute)
+    pause()
     # NNAR pathfinds to pathfinding target
     nnar.set_command_list()
     nnar.execute_command_list(execute)
@@ -68,6 +71,7 @@ def functional_main(execute=False, manual=False):
 
     # NAR step back from AR
     nar.move_to_animal_outer_ring(execute)
+    pause()
     # NAR pathfinds to pathfinding target
     nar.set_command_list()
     nar.execute_command_list(execute)
@@ -78,11 +82,17 @@ def functional_main(execute=False, manual=False):
     nar.move_to_inner_ring_animal()
     nnar.move_to_inner_ring_animal()
 
-    nar.execute_command_list(execute)
-    nnar.execute_command_list(execute)
+    nar.execute_command_list(execute, sim=True)
+    nnar.execute_command_list(execute, sim=True)
     pass
 
+def test():
+    hm.make_temp_movement_network_circular(robot1)
+    pass
 
 if __name__ == '__main__':
     functional_main()
+    functional_main()
+    # test()
     pass
+

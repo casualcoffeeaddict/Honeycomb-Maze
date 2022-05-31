@@ -3,6 +3,8 @@ from honeycomb_maze.animal import *
 from honeycomb_maze.maze import *
 from honeycomb_maze.robot import *
 
+import time
+
 # Start Logging
 # logging.basicConfig(filename='../logs/maze.log', encoding='utf-8')
 
@@ -10,9 +12,9 @@ from honeycomb_maze.robot import *
 # Instantiate maze
 hm = HexagonMaze(column_number=13, row_number=15)
 # Instantiate robots
-execute = False
+execute = True
 robot1 = PlatformRobot(3, 5, -8, 3, '192.168.0.101', execute, 'robot1')
-robot2 = PlatformRobot(2, 5, -7, 1, '192.168.0.103', execute, 'robot2')
+robot2 = PlatformRobot(2, 5, -7, 0, '192.168.0.103', execute, 'robot2')
 robot3 = PlatformRobot(3, 4, -7, 5, '192.168.0.106', execute, 'robot3')
 
 # robot4 = PlatformRobot(0, 0, 0, 0, '192.168.0.101', False, 'Robot4')
@@ -32,7 +34,8 @@ robot1.set_animal_robot(True)
 hm.save_network_image()
 mouse.set_animal_position()
 
-def functional_main(execute=False, manual=False):
+
+def functional_main(execute=execute, manual=True):
     hm.get_status()
     print('MOUSE CHOICE')
     # changes which animal is the correct animal class
@@ -72,7 +75,7 @@ def functional_main(execute=False, manual=False):
     print('NNAR step back from NAR')
     # NNAR step back from NAR
     nnar.step_back_from_NAR(execute)
-
+    hm.get_status()
     pause()
     # pathfinding method
     nnar.set_command_list()
@@ -86,9 +89,11 @@ def functional_main(execute=False, manual=False):
     # NAR moves to outer ring of AR
     # print('start', nar.position_vector)
     # print(hm.get_animal_robot_class())
-    print(nar.move_to_animal_outer_ring())  # move the animal to the outer ring
+    nar.move_to_animal_outer_ring(execute)  # move the animal to the outer ring
     # print('end', nar.position_vector)
     # print(nar.pathfinding_target_position)
+    hm.get_status()
+    pause()
     nar.set_command_list()
     # print(nar.command_list)
     # robot executes command
@@ -156,12 +161,43 @@ def test_2(robot):
 
 
 def test_3():
-    robot1.is_animal_robot = 'NAR'
-    print('Start', robot2.position_vector)
-    robot2.step_back_from_NAR(False)
-    print('End', robot2.position_vector)
+    exec = True
+    robot2.is_animal_robot = 'NAR'
+    print('Start', robot1.position_vector)
+    robot1.move_to_non_animal_outer_ring(exec)
+    # time.sleep(10)
+    command = robot1.make_command_list([(4, 5, -9), (5, 4, -9), (5, 3, -9)])
+    print(command)
+    robot1.command_list = command
+    robot1.execute_command_list(exec)
+    # robot1.command_list = [0,0,1,1,1,1]
+    # robot1.execute_command('0 0 1 1 1 1')
+    print('End', robot1.position_vector,
+          'Dir', robot1.direction)
+    print(robot1.name)
 
     pass
+
+
+def test4():
+    # robot2.is_animal_robot = 'NAR'
+    # exec = False
+    # robot1.move_to_non_animal_outer_ring(exec)
+    # # time.sleep(10)
+    # # robot1.command_list = robot1.make_command_list([(4, 5, -9), (5, 4, -9), (5, 3, -9)])
+    robot1.command_list = [1, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+    robot1.command_list = robot1.remove_zeros(robot1.command_list)
+    print(robot1.command_list)
+    # robot1.command_list = robot1.processing(robot1.command_list)
+    # print(robot1.command_list)
+    # robot1.command_list = robot1.processing(robot1.command_list)
+    # print(robot1.command_list)
+    # print(robot1.get_run_time('1 1 1 1 1 1'))
+    # [1, 1, 1, 2]
+
+def test5():
+    # robot2.is_animal_robot == 'NAR'
+    robot1.execute_command('0 0 0 1')
 
 
 if __name__ == '__main__':
@@ -169,4 +205,8 @@ if __name__ == '__main__':
     # test()
     # test_2(robot1)
     # test_3()
-    pass
+    # while hm.goal != mouse.position_vector:
+    #     functional_main()
+    # pass
+    # test4()
+    # test5()
