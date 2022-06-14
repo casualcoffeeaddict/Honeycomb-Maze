@@ -510,9 +510,7 @@ class HexagonMaze(HexagonGrid):
     def get_target_positions(self, sample_size=2):
 
         # get two target positions from the outer ring of the animal robot that are not occupied by other robots
-
         # for each robot's position vector, find the path length to each target position
-
         # the shortest path
 
         """
